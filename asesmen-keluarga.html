@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asesmen Keluarga</title>
+<meta name="description" content="APGAR Keluarga, SCREEM, siklus hidup keluarga, Indeks Barthel, kesiapan merawat, dan kepatuhan minum obat dengan skor otomatis dan ringkasan A4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+/* ---- form ---- */
+.q { display: flex; flex-direction: column; gap: 6px; padding: 9px 0; border-top: 1px dashed var(--line); }
+.q:first-child { border-top: 0; padding-top: 0; }
+.qt { font-size: 14.5px; line-height: 1.38; }
+.qt .dom { display: inline-block; min-width: 22px; font-weight: 700; color: var(--teal); }
+.intro { font-size: 13.5px; color: var(--muted); margin: 0; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 5px; }
+.opts.wide { grid-template-columns: 1fr; }
+.opts.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.opts.three .opt span { padding: 5px 4px; font-size: 13px; }
+.opt { position: relative; cursor: pointer; }
+.opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.opt span { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 5px 9px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 13.5px; line-height: 1.25; }
+.opts:not(.wide) .opt span { justify-content: center; text-align: center; }
+.opt span em { font-style: normal; font-weight: 700; min-width: 16px; color: var(--muted); }
+.opt:hover span { border-color: var(--teal); }
+.opt input:checked + span { background: var(--teal); border-color: var(--teal); color: var(--teal-ink); font-weight: 700; }
+.opt input:checked + span em { color: var(--teal-ink); }
+.opt input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+.resp { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; align-items: center; }
+.resp > b { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.resp[hidden] { display: none; }
+.score { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; background: var(--surface-2); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+.score b { color: var(--deep); font-size: 16px; }
+.stage { display: flex; flex-direction: column; gap: 5px; }
+.stage .opt span { flex-direction: column; align-items: flex-start; gap: 1px; }
+.stage .opt span small { font-weight: 400; font-size: 12.5px; opacity: .85; }
+.tasks { background: var(--surface-2); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; }
+.tasks ul { margin: 4px 0 0; padding-left: 18px; }
+.screem { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+.screem .h { font-weight: 700; color: var(--deep); font-size: 14px; grid-column: 1 / -1; margin-top: 6px; }
+.screem .h small { font-weight: 400; color: var(--muted); }
+@media (max-width: 560px) { .screem { grid-template-columns: 1fr; } .resp { grid-template-columns: 1fr; gap: 3px; } }
+
+/* ---- summary sheets ---- */
+.sheet .pg { width: 794px; height: 1123px; box-sizing: border-box; padding: 30px 40px 24px; display: flex; flex-direction: column; gap: 11px; font-family: 'Source Sans 3', 'Segoe UI', sans-serif; color: #16302E; }
+.sheet .rh { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; border-bottom: 3px solid #013A40; padding-bottom: 8px; }
+.sheet .eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: .14em; color: #028090; }
+.sheet h1 { margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 25px; line-height: 1.12; color: #013A40; }
+.sheet .sub { font-size: 12.5px; color: #4A6563; }
+.sheet .idb { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 2px 8px; width: 250px; font-size: 12.5px; }
+.sheet .idb span { color: #4A6563; font-weight: 600; }
+.sheet .idb b { border-bottom: 1px solid #8FB3AF; min-height: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet h2 { margin: 0 0 5px; display: flex; align-items: center; gap: 8px; font-family: 'Source Serif 4', Georgia, serif; font-size: 16px; color: #013A40; }
+.sheet h2 .num { width: 22px; height: 22px; border-radius: 11px; background: #013A40; color: #FFFFFF; font-family: 'Source Sans 3', sans-serif; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sheet h2 small { font-family: 'Source Sans 3', sans-serif; font-weight: 400; font-size: 12px; color: #4A6563; }
+.sheet table.t { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12.5px; }
+.sheet table.t th { background: #028090; color: #FFFFFF; text-align: left; padding: 4px 7px; font-size: 12px; border: 1px solid #028090; line-height: 1.2; }
+.sheet table.t th.c, .sheet table.t td.c { text-align: center; }
+.sheet table.t td { border: 1px solid #9FC9C4; padding: 3px 7px; vertical-align: top; line-height: 1.28; }
+.sheet table.t tr.tot td { background: #EAF5F4; font-weight: 700; }
+.sheet .muted { color: #8AA3A0; }
+.sheet .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-weight: 700; font-size: 12px; color: #FFFFFF; white-space: nowrap; }
+.sheet .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.sheet .box { background: #F4FAF9; border-radius: 6px; padding: 7px 11px; font-size: 12.5px; line-height: 1.35; }
+.sheet .box ul { margin: 3px 0 0; padding-left: 17px; }
+.sheet .cell { overflow: hidden; }
+.sheet .notes { border: 1.5px solid #9FC9C4; border-radius: 6px; padding: 7px 11px; font-size: 13px; line-height: 1.4; white-space: pre-wrap; flex-grow: 1; overflow: hidden; }
+.sheet .notes .ph { color: #8AA3A0; }
+.sheet .foot { margin-top: auto; display: flex; justify-content: space-between; gap: 16px; font-size: 10.5px; color: #4A6563; border-top: 1px solid #CFE5E2; padding-top: 5px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Asesmen Keluarga</h1><p>Enam instrumen dengan skor otomatis dan ringkasan A4</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btn-new" type="button">Asesmen baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Isi data</button><button type="button" data-view="preview">Ringkasan &amp; cetak</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="idhint" id="idhint" hidden></div>
+    <details class="card"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+    <div id="sections"></div>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Ringkasan">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+      <span class="sp"></span>
+      <span class="note">Instrumen yang belum diisi ditandai “belum diisi”.</span>
+    </div>
+    <div class="pages" id="pages"><div class="pagebox"><div class="sheet" id="sheet1"></div></div><div class="pagebox"><div class="sheet" id="sheet2"></div></div></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, esc, fmtDate, today } = KKLP;
+  const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
+
+  /* ======================= instrument content ======================= */
+  // Family APGAR (Smilkstein 1978)
+  const APGAR = [
+    ["A", "Adaptation", "Saya puas bahwa saya dapat kembali kepada keluarga saya untuk meminta bantuan bila saya menghadapi masalah."],
+    ["P", "Partnership", "Saya puas dengan cara keluarga saya membicarakan berbagai hal dengan saya dan berbagi masalah dengan saya."],
+    ["G", "Growth", "Saya puas bahwa keluarga saya menerima dan mendukung keinginan saya untuk melakukan kegiatan baru atau mengubah arah hidup."],
+    ["A", "Affection", "Saya puas dengan cara keluarga saya mengungkapkan kasih sayang dan menanggapi perasaan saya, seperti marah, sedih, atau cinta."],
+    ["R", "Resolve", "Saya puas dengan cara keluarga saya dan saya meluangkan waktu bersama."],
+  ];
+  const APGAR_OPT = [["2", "Hampir selalu"], ["1", "Kadang-kadang"], ["0", "Hampir tidak pernah"]];
+  const apgarCat = (t) => (t >= 7 ? ["Fungsi keluarga baik", "#3E9B3A"] : t >= 4 ? ["Disfungsi keluarga sedang", "#C98A00"] : ["Disfungsi keluarga berat", "#B3363F"]);
+
+  // SCREEM (Smilkstein)
+  const SCREEM = [
+    ["S", "Sosial", "interaksi dengan keluarga besar, tetangga, teman, komunitas"],
+    ["C", "Budaya (Cultural)", "nilai, tradisi, dan kebanggaan budaya yang mendukung atau menghambat"],
+    ["R", "Agama (Religious)", "pengamalan agama dan dukungan komunitas keagamaan"],
+    ["E", "Ekonomi", "kecukupan penghasilan, pekerjaan, jaminan kesehatan"],
+    ["E", "Pendidikan (Educational)", "pendidikan dan pengetahuan untuk memahami masalah kesehatan"],
+    ["M", "Medis", "akses dan pemanfaatan layanan kesehatan"],
+  ];
+
+  // Family life cycle (Duvall)
+  const STAGES = [
+    ["Keluarga baru menikah", "Pasangan menikah, belum mempunyai anak", ["Membangun pernikahan yang saling memuaskan", "Menyesuaikan diri dengan keluarga besar masing-masing", "Merencanakan keluarga (KB, persiapan kehamilan)"]],
+    ["Keluarga dengan bayi", "Anak tertua berusia 0–30 bulan", ["Beradaptasi dengan peran sebagai orang tua", "Merawat bayi sambil menjaga hubungan suami-istri", "Imunisasi, ASI, dan pemantauan tumbuh kembang"]],
+    ["Keluarga dengan anak prasekolah", "Anak tertua berusia 2,5–6 tahun", ["Memenuhi kebutuhan dan memberi stimulasi anak", "Membantu sosialisasi anak", "Mengatur jarak kelahiran dan mengatasi kelelahan orang tua"]],
+    ["Keluarga dengan anak usia sekolah", "Anak tertua berusia 6–13 tahun", ["Mendukung prestasi sekolah dan pergaulan anak", "Menjaga keharmonisan suami-istri", "Kesehatan anak sekolah dan pencegahan cedera"]],
+    ["Keluarga dengan anak remaja", "Anak tertua berusia 13–20 tahun", ["Menyeimbangkan kebebasan dan tanggung jawab remaja", "Menjaga komunikasi terbuka orang tua–anak", "Mencegah perilaku berisiko (rokok, NAPZA, seks bebas)"]],
+    ["Keluarga melepas anak dewasa", "Anak pertama hingga terakhir meninggalkan rumah", ["Melepas anak dengan dukungan yang cukup", "Menerima menantu dan cucu ke dalam keluarga", "Menata kembali peran dan hubungan suami-istri"]],
+    ["Keluarga usia pertengahan", "Rumah kosong hingga pensiun", ["Memperkuat hubungan suami-istri", "Menjaga hubungan dengan generasi tua dan muda", "Mencegah dan mengelola penyakit kronis"]],
+    ["Keluarga usia lanjut", "Pensiun hingga kedua pasangan meninggal", ["Menyesuaikan diri dengan pensiun dan penurunan fungsi", "Menghadapi kehilangan pasangan, saudara, dan teman", "Mempertahankan kemandirian dan merencanakan akhir hayat"]],
+  ];
+
+  // Barthel Index, 0–20 version
+  const BARTHEL = [
+    ["Makan", [["0", "Tidak mampu"], ["1", "Perlu bantuan, mis. memotong makanan"], ["2", "Mandiri"]]],
+    ["Mandi", [["0", "Tergantung orang lain"], ["1", "Mandiri"]]],
+    ["Perawatan diri (wajah, rambut, gigi, bercukur)", [["0", "Perlu bantuan"], ["1", "Mandiri"]]],
+    ["Berpakaian", [["0", "Tergantung orang lain"], ["1", "Perlu bantuan, sebagian dapat dilakukan sendiri"], ["2", "Mandiri, termasuk kancing dan resleting"]]],
+    ["Buang air besar", [["0", "Inkontinensia atau perlu enema"], ["1", "Kadang inkontinensia (maks. 1x seminggu)"], ["2", "Terkendali"]]],
+    ["Buang air kecil", [["0", "Inkontinensia, atau kateter dan tidak mampu mengurus sendiri"], ["1", "Kadang inkontinensia (maks. 1x 24 jam)"], ["2", "Terkendali"]]],
+    ["Penggunaan toilet", [["0", "Tergantung orang lain"], ["1", "Perlu sebagian bantuan, beberapa hal dapat sendiri"], ["2", "Mandiri (masuk-keluar, berpakaian, membersihkan)"]]],
+    ["Transfer (tempat tidur ke kursi dan kembali)", [["0", "Tidak mampu, tidak ada keseimbangan duduk"], ["1", "Bantuan besar (1–2 orang), dapat duduk"], ["2", "Bantuan kecil (verbal atau fisik)"], ["3", "Mandiri"]]],
+    ["Mobilitas (berjalan di permukaan datar)", [["0", "Tidak mampu, atau < 50 m"], ["1", "Mandiri dengan kursi roda, > 50 m"], ["2", "Berjalan dengan bantuan satu orang, > 50 m"], ["3", "Mandiri (boleh dengan tongkat), > 50 m"]]],
+    ["Naik turun tangga", [["0", "Tidak mampu"], ["1", "Perlu bantuan (verbal, fisik, alat bantu)"], ["2", "Mandiri"]]],
+  ];
+  const barthelCat = (t) => (t >= 20 ? ["Mandiri", "#3E9B3A"] : t >= 12 ? ["Ketergantungan ringan", "#6E9B2E"] : t >= 9 ? ["Ketergantungan sedang", "#C98A00"] : t >= 5 ? ["Ketergantungan berat", "#D9622B"] : ["Ketergantungan total", "#B3363F"]);
+
+  // Preparedness for Caregiving Scale (Archbold et al. 1990)
+  const PCS = [
+    "merawat kebutuhan fisik anggota keluarga Anda?",
+    "merawat kebutuhan emosionalnya?",
+    "mencari tahu dan mengatur layanan yang ia perlukan?",
+    "menghadapi stres dalam merawat?",
+    "membuat kegiatan merawat terasa menyenangkan bagi Anda dan dirinya?",
+    "menanggapi dan menangani keadaan darurat yang menyangkut dirinya?",
+    "mendapatkan bantuan dan informasi yang Anda perlukan dari layanan kesehatan?",
+    "Secara keseluruhan, seberapa siap Anda merawat anggota keluarga Anda?",
+  ];
+  const PCS_OPT = [["0", "Tidak siap sama sekali"], ["1", "Kurang siap"], ["2", "Cukup siap"], ["3", "Siap"], ["4", "Sangat siap"]];
+
+  // Morisky-Green-Levine 4-item (1986)
+  const MGL = [
+    ["Apakah Anda pernah lupa minum obat?", "Tidak sengaja"],
+    ["Apakah Anda kadang-kadang kurang memperhatikan waktu minum obat?", "Tidak sengaja"],
+    ["Ketika merasa lebih baik, apakah Anda kadang-kadang berhenti minum obat?", "Sengaja"],
+    ["Bila merasa lebih buruk setelah minum obat, apakah Anda kadang-kadang berhenti meminumnya?", "Sengaja"],
+  ];
+  const mglCat = (t) => (t === 0 ? ["Kepatuhan tinggi", "#3E9B3A"] : t <= 2 ? ["Kepatuhan sedang", "#C98A00"] : ["Kepatuhan rendah", "#B3363F"]);
+
+  /* ======================= form ======================= */
+  const radios = (k, opts, cls) => `<div class="opts ${cls || ""}" role="radiogroup">${opts.map(([v, l]) => `<label class="opt"><input type="radio" name="${k}" data-k="${k}" value="${v}"><span>${cls === "wide" ? `<em>${v}</em>` : ""}${l}</span></label>`).join("")}</div>`;
+  const card = (id, no, title, inner, open) => `<details class="card" id="sec-${id}"${open ? " open" : ""}><summary>${no ? `<span class="secno">${no}</span> ` : ""}${title} <span class="count" id="cnt-${id}"></span></summary><div class="card-body">${inner}</div></details>`;
+  const resp = (i) => `<div class="field"><label for="ap-n${i}">Responden ${i + 1}</label><input type="text" id="ap-n${i}" data-k="apN${i}" placeholder="${i === 0 ? "mis. Pasien (Bapak S)" : "kosongkan bila tidak ada"}"></div>`;
+
+  $("#sections").innerHTML =
+    card("id", 0, "Identitas", `
+      <div class="field"><label for="f-nama">Nama pasien</label><input type="text" id="f-nama" data-k="nama" data-id="1"></div>
+      <div class="grid3">
+        <div class="field"><label for="f-rm">No. RM</label><input type="text" id="f-rm" data-k="rm" data-id="1"></div>
+        <div class="field"><label for="f-usia">Usia (th)</label><input type="text" id="f-usia" data-k="usia" inputmode="numeric" maxlength="3"></div>
+        <div class="field"><label for="f-tgl">Tanggal</label><input type="date" id="f-tgl" data-k="tanggal"></div>
+      </div>
+      <div class="field"><label for="f-kel">Keluarga</label><input type="text" id="f-kel" data-k="keluarga" placeholder="mis. Keluarga Bapak S"></div>`, true) +
+    card("apgar", 1, "APGAR Keluarga", `
+      <p class="intro">Diisi oleh satu atau beberapa anggota keluarga (maks. 3) untuk membandingkan persepsi fungsi keluarga.</p>
+      <div class="grid3">${[0, 1, 2].map(resp).join("")}</div>
+      ${APGAR.map(([L, dom, t], i) => `<div class="q"><div class="qt"><span class="dom">${L}</span>${t} <span class="note">(${dom})</span></div>
+        ${[0, 1, 2].map((r) => `<div class="resp" data-resp="${r}"><b data-rn="${r}">Responden ${r + 1}</b>${radios("ap" + r + "_" + i, APGAR_OPT, "three")}</div>`).join("")}</div>`).join("")}
+      <div class="score" id="sc-apgar"></div>`) +
+    card("screem", 2, "SCREEM", `<p class="intro">Tuliskan sumber daya yang dimiliki keluarga dan masalah (patologi) pada setiap aspek. Singkat saja.</p>
+      <div class="screem">${SCREEM.map(([L, name, hint], i) => `<div class="h">${L} · ${name} <small>${hint}</small></div>
+        <textarea data-k="sc${i}r" rows="2" aria-label="${name}: sumber daya" placeholder="Sumber daya"></textarea><textarea data-k="sc${i}p" rows="2" aria-label="${name}: masalah" placeholder="Masalah / patologi"></textarea>`).join("")}</div>
+      <div class="score" id="sc-screem"></div>`) +
+    card("siklus", 3, "Siklus hidup keluarga (Duvall)", `
+      <div class="stage" role="radiogroup">${STAGES.map(([n, d], i) => `<label class="opt"><input type="radio" name="tahap" data-k="tahap" value="${i}"><span><b>Tahap ${i + 1}. ${n}</b><small>${d}</small></span></label>`).join("")}</div>
+      <div class="tasks" id="tasks"></div>
+      <div class="field"><label for="f-tahapc">Catatan: tugas perkembangan yang belum tercapai, atau tahap yang tumpang tindih</label><textarea id="f-tahapc" data-k="tahapCat" rows="2"></textarea></div>`) +
+    card("barthel", 4, "Indeks Barthel (ADL)", `<p class="intro">Nilai kemampuan pasien saat ini (versi skor 0–20).</p>` +
+      BARTHEL.map(([name, opts], i) => `<div class="q"><div class="qt"><b>${i + 1}. ${name}</b></div>${radios("ba" + i, opts, "wide")}</div>`).join("") +
+      `<div class="score" id="sc-barthel"></div>`) +
+    card("pcs", 5, "Kesiapan merawat (Preparedness for Caregiving Scale)", `
+      <div class="field"><label for="f-cg">Pelaku rawat (caregiver)</label><input type="text" id="f-cg" data-k="cgNama" placeholder="mis. Dewi (anak)"></div>
+      <p class="intro">Seberapa siap menurut Anda, diri Anda untuk…</p>` +
+      PCS.map((t, i) => `<div class="q"><div class="qt"><b>${i + 1}.</b> ${t}</div>${radios("pc" + i, PCS_OPT)}</div>`).join("") +
+      `<div class="score" id="sc-pcs"></div>`) +
+    card("mgl", 6, "Kepatuhan minum obat (Morisky 4 butir)", `
+      <div class="field"><label for="f-mglr">Responden</label><input type="text" id="f-mglr" data-k="mglResp" placeholder="pasien atau pendamping yang menyiapkan obat"></div>` +
+      MGL.map(([t], i) => `<div class="q"><div class="qt"><b>${i + 1}.</b> ${t}</div>${radios("mg" + i, [["1", "Ya"], ["0", "Tidak"]])}</div>`).join("") +
+      `<div class="score" id="sc-mgl"></div>`) +
+    card("kes", 0, "Kesimpulan dan rencana", `<div class="field"><label for="f-kes">Kesimpulan asesmen keluarga dan rencana tindak lanjut</label><textarea id="f-kes" data-k="kesimpulan" rows="5"></textarea></div>
+      <div class="field"><label for="f-foot">Kaki halaman</label><input type="text" id="f-foot" data-k="footer"></div>`);
+
+  /* ======================= scoring ======================= */
+  const has = (st, k) => st[k] !== undefined && st[k] !== null && String(st[k]) !== "";
+  const n = (st, k) => Number(st[k]);
+  function score(st) {
+    const R = {};
+    R.apgar = [0, 1, 2].map((r) => {
+      const name = (st["apN" + r] || "").trim() || (r === 0 ? "Responden 1" : "");
+      const vals = APGAR.map((_, i) => (has(st, "ap" + r + "_" + i) ? n(st, "ap" + r + "_" + i) : null));
+      const answered = vals.filter((v) => v !== null).length;
+      return { name, vals, answered, total: answered === 5 ? vals.reduce((a, b) => a + b, 0) : null, active: r === 0 || !!(st["apN" + r] || "").trim() || answered > 0 };
+    }).filter((x) => x.active);
+    R.screem = SCREEM.map((_, i) => ({ r: (st["sc" + i + "r"] || "").trim(), p: (st["sc" + i + "p"] || "").trim() }));
+    R.screemFilled = R.screem.filter((x) => x.r || x.p).length;
+    R.screemPat = R.screem.map((x, i) => (x.p ? SCREEM[i][1].split(" ")[0] : null)).filter(Boolean);
+    R.tahap = has(st, "tahap") ? n(st, "tahap") : null;
+    const bv = BARTHEL.map((_, i) => (has(st, "ba" + i) ? n(st, "ba" + i) : null));
+    R.barthel = { vals: bv, answered: bv.filter((v) => v !== null).length };
+    if (R.barthel.answered === 10) R.barthel.total = bv.reduce((a, b) => a + b, 0);
+    const pv = PCS.map((_, i) => (has(st, "pc" + i) ? n(st, "pc" + i) : null)), pa = pv.filter((v) => v !== null);
+    R.pcs = { vals: pv, answered: pa.length, mean: pa.length ? pa.reduce((a, b) => a + b, 0) / pa.length : null, low: pv.map((v, i) => (v !== null && v <= 1 ? i : -1)).filter((i) => i >= 0) };
+    const mv = MGL.map((_, i) => (has(st, "mg" + i) ? n(st, "mg" + i) : null));
+    R.mgl = { vals: mv, answered: mv.filter((v) => v !== null).length };
+    if (R.mgl.answered === 4) { R.mgl.total = mv.reduce((a, b) => a + b, 0); R.mgl.unint = mv[0] + mv[1]; R.mgl.inten = mv[2] + mv[3]; }
+    return R;
+  }
+
+  /* ======================= render ======================= */
+  const pill = ([t, c]) => `<span class="pill" style="background:${c}">${esc(t)}</span>`;
+  const fmt1 = (x) => (Math.round(x * 100) / 100).toFixed(2).replace(/\.?0+$/, "") || "0";
+  function render(st) {
+    const R = score(st);
+    // ----- form scores -----
+    $$("[data-resp]").forEach((row) => {
+      const r = Number(row.dataset.resp), name = (st["apN" + r] || "").trim();
+      row.hidden = r > 0 && !name; row.querySelector("[data-rn]").textContent = name || "Responden " + (r + 1);
+    });
+    $("#sc-apgar").innerHTML = R.apgar.map((a) => `<span>${esc(a.name)}: ${a.total === null ? `<span class="note">${a.answered}/5 terjawab</span>` : `<b>${a.total}</b>/10 · ${apgarCat(a.total)[0]}`}</span>`).join("");
+    $("#cnt-apgar").textContent = R.apgar.map((a) => (a.total === null ? "–" : a.total)).join(" · ");
+    $("#sc-screem").innerHTML = `<span>${R.screemFilled}/6 aspek terisi</span>` + (R.screemPat.length ? `<span>Masalah pada: <b style="font-size:14px">${esc(R.screemPat.join(", "))}</b></span>` : "");
+    $("#cnt-screem").textContent = R.screemFilled + "/6";
+    $("#tasks").innerHTML = R.tahap === null ? `<span class="note">Pilih tahap untuk melihat tugas perkembangannya.</span>` : `<b>Tugas perkembangan tahap ${R.tahap + 1}:</b><ul>${STAGES[R.tahap][2].map((t) => `<li>${t}</li>`).join("")}</ul>`;
+    $("#cnt-siklus").textContent = R.tahap === null ? "" : "Tahap " + (R.tahap + 1);
+    $("#sc-barthel").innerHTML = R.barthel.total === undefined ? `<span class="note">${R.barthel.answered}/10 terjawab</span>` : `<span>Skor <b>${R.barthel.total}</b>/20 (setara ${R.barthel.total * 5}/100)</span><span>${barthelCat(R.barthel.total)[0]}</span>`;
+    $("#cnt-barthel").textContent = R.barthel.total === undefined ? R.barthel.answered + "/10" : R.barthel.total + "/20";
+    $("#sc-pcs").innerHTML = R.pcs.mean === null ? `<span class="note">0/8 terjawab</span>` : `<span>Rerata <b>${fmt1(R.pcs.mean)}</b> dari 4 (${R.pcs.answered}/8 terjawab)</span>` + (R.pcs.low.length ? `<span>Kurang siap pada butir ${R.pcs.low.map((i) => i + 1).join(", ")}</span>` : "");
+    $("#cnt-pcs").textContent = R.pcs.mean === null ? "" : fmt1(R.pcs.mean) + " / 4";
+    $("#sc-mgl").innerHTML = R.mgl.total === undefined ? `<span class="note">${R.mgl.answered}/4 terjawab</span>` : `<span>Skor <b>${R.mgl.total}</b>/4 · ${mglCat(R.mgl.total)[0]}</span>` + (R.mgl.total ? `<span>Ketidakpatuhan ${R.mgl.unint && R.mgl.inten ? "sengaja dan tidak sengaja" : R.mgl.unint ? "tidak sengaja (lupa/lalai)" : "sengaja (menghentikan obat)"}</span>` : "");
+    $("#cnt-mgl").textContent = R.mgl.total === undefined ? R.mgl.answered + "/4" : R.mgl.total + "/4";
+
+    // ----- sheet helpers -----
+    const idBox = `<div class="idb"><span>Pasien</span><b>${esc(st.nama || "")}</b><span>No. RM</span><b>${esc(st.rm || "")}</b><span>Usia</span><b>${esc(st.usia ? st.usia + " tahun" : "")}</b><span>Tanggal</span><b>${esc(fmtDate(st.tanggal, "short"))}</b></div>`;
+    const head = (title) => `<div class="rh"><div><div class="eyebrow">KEDOKTERAN KELUARGA LAYANAN PRIMER</div><h1>${title}</h1><div class="sub">${esc(st.keluarga || "Keluarga")}</div></div>${idBox}</div>`;
+    const foot = (pg) => `<div class="foot"><span>${esc(st.footer || "")}<br>APGAR &amp; SCREEM: Smilkstein · Siklus hidup: Duvall · Barthel versi 0–20 · Preparedness for Caregiving Scale: Archbold dkk. 1990 · Morisky, Green &amp; Levine 1986. Terjemahan tidak resmi.</span><span style="font-weight:700;white-space:nowrap">Halaman ${pg} / 2</span></div>`;
+    const none = `<span class="muted">belum diisi</span>`;
+
+    // ----- page 1: summary + APGAR + Barthel -----
+    const rows = [];
+    R.apgar.forEach((a) => rows.push(["APGAR Keluarga", a.name, a.total === null ? none : a.total + " / 10", a.total === null ? "" : pill(apgarCat(a.total))]));
+    rows.push(["SCREEM", "", R.screemFilled ? R.screemFilled + " / 6 aspek" : none, R.screemFilled ? (R.screemPat.length ? "Masalah: " + esc(R.screemPat.join(", ")) : "Tidak ada masalah tercatat") : ""]);
+    rows.push(["Siklus hidup keluarga", "", R.tahap === null ? none : "Tahap " + (R.tahap + 1), R.tahap === null ? "" : esc(STAGES[R.tahap][0])]);
+    rows.push(["Indeks Barthel", "Pasien", R.barthel.total === undefined ? none : R.barthel.total + " / 20", R.barthel.total === undefined ? "" : pill(barthelCat(R.barthel.total))]);
+    rows.push(["Kesiapan merawat", esc(st.cgNama || ""), R.pcs.mean === null ? none : "Rerata " + fmt1(R.pcs.mean) + " / 4", R.pcs.mean === null ? "" : (R.pcs.low.length ? "Kurang siap: butir " + R.pcs.low.map((i) => i + 1).join(", ") : "Tidak ada butir kurang siap")]);
+    rows.push(["Kepatuhan minum obat", esc(st.mglResp || ""), R.mgl.total === undefined ? none : R.mgl.total + " / 4", R.mgl.total === undefined ? "" : pill(mglCat(R.mgl.total))]);
+    const apCols = R.apgar.length;
+    const apTable = `<table class="t"><colgroup><col style="width:28px"><col>${R.apgar.map(() => `<col style="width:${apCols === 1 ? 110 : 92}px">`).join("")}</colgroup>
+      <thead><tr><th class="c"></th><th>Komponen</th>${R.apgar.map((a) => `<th class="c" style="padding:4px 3px">${esc(a.name)}</th>`).join("")}</tr></thead><tbody>` +
+      APGAR.map(([L, dom, t], i) => `<tr><td class="c"><b>${L}</b></td><td><b>${dom}</b> · <span style="color:#4A6563">${esc(t)}</span></td>${R.apgar.map((a) => `<td class="c">${a.vals[i] === null ? "–" : a.vals[i]}</td>`).join("")}</tr>`).join("") +
+      `<tr class="tot"><td></td><td>Total (7–10 baik · 4–6 disfungsi sedang · 0–3 disfungsi berat)</td>${R.apgar.map((a) => `<td class="c">${a.total === null ? "–" : a.total}</td>`).join("")}</tr></tbody></table>`;
+    const baTable = `<table class="t"><colgroup><col style="width:24px"><col style="width:34%"><col><col style="width:46px"></colgroup>
+      <thead><tr><th class="c">No</th><th>Aktivitas</th><th>Kemampuan</th><th class="c">Skor</th></tr></thead><tbody>` +
+      BARTHEL.map(([name, opts], i) => { const v = R.barthel.vals[i]; const o = v === null ? null : opts.find((x) => Number(x[0]) === v); return `<tr><td class="c">${i + 1}</td><td>${esc(name)}</td><td>${o ? esc(o[1]) : none}</td><td class="c">${v === null ? "–" : v + "/" + opts[opts.length - 1][0]}</td></tr>`; }).join("") +
+      `<tr class="tot"><td></td><td colspan="2">Total (20 mandiri · 12–19 ringan · 9–11 sedang · 5–8 berat · 0–4 total)</td><td class="c">${R.barthel.total === undefined ? "–" : R.barthel.total}</td></tr></tbody></table>`;
+    $("#sheet1").innerHTML = `<div class="pg">${head("Ringkasan Asesmen Keluarga")}
+      <section><h2>Ringkasan</h2><table class="t"><colgroup><col style="width:27%"><col style="width:20%"><col style="width:17%"><col></colgroup>
+        <thead><tr><th>Instrumen</th><th>Responden</th><th>Skor</th><th>Interpretasi</th></tr></thead><tbody>${rows.map((r) => `<tr><td><b>${r[0]}</b></td><td>${r[1] ? esc(r[1]).replace(/&amp;/g, "&") : ""}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("")}</tbody></table></section>
+      <section><h2><span class="num">1</span>APGAR Keluarga <small>Hampir selalu = 2 · Kadang-kadang = 1 · Hampir tidak pernah = 0</small></h2>${apTable}</section>
+      <section><h2><span class="num">4</span>Indeks Barthel (ADL)</h2>${baTable}</section>
+      ${foot(1)}</div>`;
+
+    // ----- page 2: SCREEM, life cycle, PCS, MGL, conclusion -----
+    const scTable = `<table class="t"><colgroup><col style="width:22%"><col><col></colgroup><thead><tr><th>Aspek</th><th>Sumber daya</th><th>Masalah / patologi</th></tr></thead><tbody>` +
+      SCREEM.map(([L, name], i) => `<tr><td><b>${L}</b> · ${name}</td><td><div class="cell" data-fit="9" style="max-height:34px">${esc(R.screem[i].r) || "<span class='muted'>–</span>"}</div></td><td><div class="cell" data-fit="9" style="max-height:34px">${esc(R.screem[i].p) || "<span class='muted'>–</span>"}</div></td></tr>`).join("") + `</tbody></table>`;
+    const stageBox = R.tahap === null ? `<div class="box">${none}</div>` : `<div class="box"><b>Tahap ${R.tahap + 1}. ${STAGES[R.tahap][0]}</b> <span style="color:#4A6563">(${STAGES[R.tahap][1]})</span><ul>${STAGES[R.tahap][2].map((t) => `<li>${t}</li>`).join("")}</ul>${st.tahapCat ? `<div style="margin-top:4px"><b>Catatan:</b> <span class="cell" data-fit="9" style="display:block;max-height:34px">${esc(st.tahapCat)}</span></div>` : ""}</div>`;
+    const pcsTable = `<table class="t"><colgroup><col style="width:22px"><col><col style="width:34px"></colgroup><thead><tr><th class="c">No</th><th>Seberapa siap Anda untuk…</th><th class="c">0–4</th></tr></thead><tbody>` +
+      PCS.map((t, i) => `<tr><td class="c">${i + 1}</td><td style="font-size:11.5px">${esc(t.replace(/^Secara keseluruhan, seberapa siap Anda /, "secara keseluruhan, "))}</td><td class="c" style="${R.pcs.vals[i] !== null && R.pcs.vals[i] <= 1 ? "color:#B3363F;font-weight:700" : ""}">${R.pcs.vals[i] === null ? "–" : R.pcs.vals[i]}</td></tr>`).join("") +
+      `<tr class="tot"><td></td><td>Rerata (makin tinggi makin siap)</td><td class="c">${R.pcs.mean === null ? "–" : fmt1(R.pcs.mean)}</td></tr></tbody></table>`;
+    const mglTable = `<table class="t"><colgroup><col style="width:22px"><col><col style="width:44px"></colgroup><thead><tr><th class="c">No</th><th>Pertanyaan</th><th class="c">Jawab</th></tr></thead><tbody>` +
+      MGL.map(([t], i) => `<tr><td class="c">${i + 1}</td><td style="font-size:11.5px">${esc(t)}</td><td class="c">${R.mgl.vals[i] === null ? "–" : R.mgl.vals[i] ? "<b>Ya</b>" : "Tidak"}</td></tr>`).join("") +
+      `<tr class="tot"><td></td><td>Skor (0 tinggi · 1–2 sedang · 3–4 rendah)</td><td class="c">${R.mgl.total === undefined ? "–" : R.mgl.total}</td></tr></tbody></table>` +
+      (R.mgl.total ? `<div style="font-size:11.5px;color:#4A6563;margin-top:3px">Butir 1–2: ketidakpatuhan tidak sengaja (${R.mgl.unint}) · butir 3–4: sengaja (${R.mgl.inten})</div>` : "");
+    $("#sheet2").innerHTML = `<div class="pg">${head("Ringkasan Asesmen Keluarga")}
+      <section><h2><span class="num">2</span>SCREEM</h2>${scTable}</section>
+      <section><h2><span class="num">3</span>Siklus Hidup Keluarga (Duvall)</h2>${stageBox}</section>
+      <div class="grid2">
+        <section><h2><span class="num">5</span>Kesiapan Merawat <small>${esc(st.cgNama || "")}</small></h2>${pcsTable}</section>
+        <section><h2><span class="num">6</span>Kepatuhan Minum Obat <small>${esc(st.mglResp || "")}</small></h2>${mglTable}</section>
+      </div>
+      <section style="flex-grow:1;display:flex;flex-direction:column;min-height:0"><h2>Kesimpulan dan Rencana</h2><div class="notes" data-fit="9.5">${st.kesimpulan ? esc(st.kesimpulan) : `<span class="ph">&#160;</span>`}</div></section>
+      ${foot(2)}</div>`;
+  }
+
+  function defaults() { return { tanggal: today(), apN0: "Pasien", footer: "Asesmen Keluarga - " + DOKTER }; }
+  function sample() {
+    const s = { nama: "Bapak S (contoh)", rm: "12-34-56", usia: "64", keluarga: "Keluarga Bapak S", apN0: "Bapak S", apN1: "Ibu R", apN2: "Dewi",
+      tahap: "6", tahapCat: "Anak bungsu (Dewi) masih tinggal serumah dan menjadi pelaku rawat utama.",
+      cgNama: "Dewi (anak, 30 th)", mglResp: "Bapak S, dibantu Dewi",
+      kesimpulan: "Fungsi keluarga menurun terutama pada komponen partnership dan resolve; konflik suami-istri sejak stroke. Dewi menjadi pelaku rawat tunggal dengan kesiapan kurang dalam menghadapi stres dan keadaan darurat.\nRencana: konferensi keluarga dengan Budi; edukasi Dewi tentang penanganan darurat dan perawatan pasca stroke; libatkan pengajian untuk dukungan antar-jemput; kotak obat mingguan dan alarm minum obat." };
+    [[2, 1, 1, 1, 1], [1, 0, 1, 1, 0], [2, 1, 2, 2, 1]].forEach((r, i) => r.forEach((v, j) => { s["ap" + i + "_" + j] = String(v); }));
+    [["Aktif di pengajian; tetangga baik", "Budi tinggal jauh dan jarang berkunjung"], ["", ""], ["Keluarga taat beribadah, pengajian bersedia membantu", ""],
+     ["Pensiun PNS, BPJS aktif", "Biaya fisioterapi dan transportasi menambah beban"], ["Dewi lulusan D3, mudah menerima edukasi", "Ibu R kurang memahami penyakit kronis"],
+     ["Dekat dengan puskesmas (PRB)", "Fisioterapi di RS sulit dijangkau tanpa kendaraan"]].forEach((r, i) => { s["sc" + i + "r"] = r[0]; s["sc" + i + "p"] = r[1]; });
+    [2, 0, 1, 1, 2, 2, 1, 2, 2, 0].forEach((v, i) => { s["ba" + i] = String(v); });
+    [3, 2, 2, 1, 2, 1, 3, 2].forEach((v, i) => { s["pc" + i] = String(v); });
+    [1, 0, 1, 0].forEach((v, i) => { s["mg" + i] = String(v); });
+    return s;
+  }
+  KKLP.docTool({ key: "asesmen-keluarga", defaults, sample, render });
+})();
+</script>
+</body>
+</html>
