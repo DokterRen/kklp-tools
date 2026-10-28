@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Indeks Barthel</title>
+<meta name="description" content="Indeks Barthel (ADL) versi 0–20 dengan skor dan kategori ketergantungan otomatis, ringkasan A4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/instrumen.css"><style>
+.sheet .result { display: flex; align-items: center; gap: 22px; background: #F4FAF9; border-radius: 10px; padding: 14px 20px; font-size: 14px; }
+.sheet .result .big { font-family: 'Source Serif 4', Georgia, serif; font-size: 52px; font-weight: 700; line-height: 1; color: #013A40; }
+.sheet .result .big small { font-size: 22px; color: #4A6563; }
+.sheet .result .pill { font-size: 15px; padding: 3px 12px; border-radius: 14px; }
+.sheet .result .eq { margin-top: 4px; font-size: 12.5px; color: #4A6563; }
+.sheet .bands { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.sheet .bands div { border-radius: 6px; padding: 5px 6px; text-align: center; font-size: 11.5px; color: #4A6563; border: 1.5px solid #D5E4E1; line-height: 1.2; }
+.sheet .bands div b { display: block; font-size: 13px; color: #16302E; }
+.sheet .bands div.on { background: var(--c); border-color: var(--c); color: #FFFFFF; }
+.sheet .bands div.on b { color: #FFFFFF; }
+.sheet .idb { grid-template-columns: 84px minmax(0, 1fr); width: 290px; }
+.sheet .meta { display: flex; flex-wrap: wrap; gap: 2px 18px; font-size: 13px; margin-top: -4px; }
+.sheet .meta b { color: #4A6563; font-weight: 600; }
+.sheet .hbar { height: 9px; border-radius: 5px; background: #E6EEED; overflow: hidden; }
+.sheet .hbar i { display: block; height: 100%; }
+.sheet table.t { font-size: 13px; }
+.sheet table.t td { padding: 5px 8px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Indeks Barthel</h1><p>Aktivitas kehidupan sehari-hari (ADL), skor 0–20</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btn-new" type="button">Penilaian baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Isi data</button><button type="button" data-view="preview">Ringkasan &amp; cetak</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="idhint" id="idhint" hidden></div>
+    <details class="card"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+    <div id="sections"></div>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Ringkasan">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+    </div>
+    <div class="pages" id="pages"><div class="pagebox"><div class="sheet" id="sheet1"></div></div></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/instrumen.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, esc, today } = KKLP;
+  const { radios, card, pill, fmt1, has, num, none, identity, head, foot, notes } = KKLP_I;
+  const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
+
+  const ITEMS = [
+    ["Makan", [["0", "Tidak mampu"], ["1", "Perlu bantuan, mis. memotong makanan"], ["2", "Mandiri"]]],
+    ["Mandi", [["0", "Tergantung orang lain"], ["1", "Mandiri"]]],
+    ["Perawatan diri (wajah, rambut, gigi, bercukur)", [["0", "Perlu bantuan"], ["1", "Mandiri"]]],
+    ["Berpakaian", [["0", "Tergantung orang lain"], ["1", "Perlu bantuan, sebagian dapat dilakukan sendiri"], ["2", "Mandiri, termasuk kancing dan resleting"]]],
+    ["Buang air besar", [["0", "Inkontinensia atau perlu enema"], ["1", "Kadang inkontinensia (maks. 1x seminggu)"], ["2", "Terkendali"]]],
+    ["Buang air kecil", [["0", "Inkontinensia, atau kateter dan tidak mampu mengurus sendiri"], ["1", "Kadang inkontinensia (maks. 1x 24 jam)"], ["2", "Terkendali"]]],
+    ["Penggunaan toilet", [["0", "Tergantung orang lain"], ["1", "Perlu sebagian bantuan, beberapa hal dapat sendiri"], ["2", "Mandiri (masuk-keluar, berpakaian, membersihkan)"]]],
+    ["Transfer (tempat tidur ke kursi dan kembali)", [["0", "Tidak mampu, tidak ada keseimbangan duduk"], ["1", "Bantuan besar (1–2 orang), dapat duduk"], ["2", "Bantuan kecil (verbal atau fisik)"], ["3", "Mandiri"]]],
+    ["Mobilitas (berjalan di permukaan datar)", [["0", "Tidak mampu, atau < 50 m"], ["1", "Mandiri dengan kursi roda, > 50 m"], ["2", "Berjalan dengan bantuan satu orang, > 50 m"], ["3", "Mandiri (boleh dengan tongkat), > 50 m"]]],
+    ["Naik turun tangga", [["0", "Tidak mampu"], ["1", "Perlu bantuan (verbal, fisik, alat bantu)"], ["2", "Mandiri"]]],
+  ];
+  const CATS = [[20, "Mandiri", "#3E9B3A"], [12, "Ketergantungan ringan", "#6E9B2E"], [9, "Ketergantungan sedang", "#C98A00"], [5, "Ketergantungan berat", "#D9622B"], [0, "Ketergantungan total", "#B3363F"]];
+  const cat = (t) => { const c = CATS.find((x) => t >= x[0]); return [c[1], c[2]]; };
+  $("#sections").innerHTML =
+    card("id", 0, "Identitas", identity() + `<div class="grid2">
+      <div class="field"><label for="f-sumber">Sumber informasi</label><input type="text" id="f-sumber" data-k="sumber" placeholder="mis. pengamatan langsung, keluarga"></div>
+      <div class="field"><label for="f-kond">Kondisi / diagnosis</label><input type="text" id="f-kond" data-k="kondisi" placeholder="mis. pasca stroke"></div></div>`, true) +
+    card("items", 0, "Indeks Barthel", `<p class="intro">Nilai kemampuan pasien saat ini, bukan kemampuan yang mungkin dicapai (versi skor 0–20).</p>` +
+      ITEMS.map(([name, opts], i) => `<div class="q"><div class="qt"><b>${i + 1}. ${name}</b></div>${radios("ba" + i, opts, "wide")}</div>`).join("") +
+      `<div class="score" id="sc"></div>`, true) +
+    card("cat", 0, "Catatan dan rencana", `<div class="field"><label for="f-cat">Kebutuhan bantuan, alat bantu, dan rencana</label><textarea id="f-cat" data-k="catatan" rows="4"></textarea></div>
+      <div class="field"><label for="f-foot">Kaki halaman</label><input type="text" id="f-foot" data-k="footer"></div>`);
+  function render(st) {
+    const vals = ITEMS.map((_, i) => (has(st, "ba" + i) ? num(st, "ba" + i) : null)), answered = vals.filter((v) => v !== null).length;
+    const total = answered === 10 ? vals.reduce((a, b) => a + b, 0) : null;
+    $("#sc").innerHTML = total === null ? `<span class="note">${answered}/10 terjawab</span>` : `<span>Skor <b>${total}</b>/20 (setara ${total * 5}/100)</span><span>${cat(total)[0]}</span>`;
+    $("#cnt-items").textContent = total === null ? answered + "/10" : total + "/20";
+    const table = `<table class="t"><colgroup><col style="width:28px"><col style="width:33%"><col><col style="width:52px"></colgroup>
+      <thead><tr><th class="c">No</th><th>Aktivitas</th><th>Kemampuan</th><th class="c">Skor</th></tr></thead><tbody>` +
+      ITEMS.map(([name, opts], i) => { const v = vals[i]; const o = v === null ? null : opts.find((x) => Number(x[0]) === v); return `<tr><td class="c">${i + 1}</td><td>${esc(name)}</td><td>${o ? esc(o[1]) : none}</td><td class="c">${v === null ? "–" : v + " / " + opts[opts.length - 1][0]}</td></tr>`; }).join("") +
+      `<tr class="tot"><td></td><td colspan="2">Total</td><td class="c">${total === null ? "–" : total}</td></tr></tbody></table>`;
+    const band = `<div class="bands">${CATS.slice().reverse().map((c, i, arr) => { const hi = i === arr.length - 1 ? 20 : arr[i + 1][0] - 1; const on = total !== null && cat(total)[0] === c[1];
+      return `<div class="${on ? "on" : ""}" style="--c:${c[2]}"><b>${c[0] === hi ? c[0] : c[0] + "–" + hi}</b><span>${c[1]}</span></div>`; }).join("")}</div>`;
+    $("#sheet1").innerHTML = `<div class="pg">${head(st, "Indeks Barthel (ADL)", "Aktivitas kehidupan sehari-hari")}
+      ${st.kondisi || st.sumber ? `<div class="meta">${st.kondisi ? `<span><b>Kondisi:</b> ${esc(st.kondisi)}</span>` : ""}${st.sumber ? `<span><b>Sumber informasi:</b> ${esc(st.sumber)}</span>` : ""}</div>` : ""}
+      <div class="result">${total === null ? `<div class="big muted">–</div><div>${answered}/10 butir terjawab</div>` : `<div class="big">${total}<small> / 20</small></div><div>${pill(cat(total))}<div class="eq">setara ${total * 5} / 100</div></div>`}</div>
+      ${band}
+      <section>${table}</section>
+      ${notes(st, "catatan", "Catatan dan Rencana")}
+      ${foot(st, "Indeks Barthel (Mahoney &amp; Barthel 1965), versi skor 0–20; kategori sesuai pedoman pelayanan geriatri di Indonesia. Terjemahan tidak resmi.")}</div>`;
+  }
+  function defaults() { return { tanggal: today(), footer: "Indeks Barthel - " + DOKTER }; }
+  function sample() {
+    const s = { nama: "Bapak S (contoh)", rm: "12-34-56", usia: "64", kondisi: "Pasca stroke iskemik, hemiparesis kiri", sumber: "Pengamatan dan keterangan Dewi (anak)",
+      catatan: "Perlu bantuan saat mandi dan naik tangga. Rencana: kursi mandi dan pegangan di kamar mandi; latihan transfer bersama fisioterapis; kamar tidur dipindah ke lantai bawah." };
+    [2, 0, 1, 1, 2, 2, 1, 2, 2, 0].forEach((v, i) => { s["ba" + i] = String(v); });
+    return s;
+  }
+  KKLP.docTool({ key: "barthel", defaults, sample, render });
+
+})();
+</script>
+</body>
+</html>

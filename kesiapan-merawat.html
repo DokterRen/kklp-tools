@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kesiapan Merawat</title>
+<meta name="description" content="Preparedness for Caregiving Scale untuk pelaku rawat, dengan skor otomatis dan ringkasan A4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/instrumen.css"><style>
+.sheet .result { display: flex; align-items: center; gap: 22px; background: #F4FAF9; border-radius: 10px; padding: 14px 20px; font-size: 14px; }
+.sheet .result .big { font-family: 'Source Serif 4', Georgia, serif; font-size: 52px; font-weight: 700; line-height: 1; color: #013A40; }
+.sheet .result .big small { font-size: 22px; color: #4A6563; }
+.sheet .result .pill { font-size: 15px; padding: 3px 12px; border-radius: 14px; }
+.sheet .result .eq { margin-top: 4px; font-size: 12.5px; color: #4A6563; }
+.sheet .bands { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.sheet .bands div { border-radius: 6px; padding: 5px 6px; text-align: center; font-size: 11.5px; color: #4A6563; border: 1.5px solid #D5E4E1; line-height: 1.2; }
+.sheet .bands div b { display: block; font-size: 13px; color: #16302E; }
+.sheet .bands div.on { background: var(--c); border-color: var(--c); color: #FFFFFF; }
+.sheet .bands div.on b { color: #FFFFFF; }
+.sheet .idb { grid-template-columns: 84px minmax(0, 1fr); width: 290px; }
+.sheet .meta { display: flex; flex-wrap: wrap; gap: 2px 18px; font-size: 13px; margin-top: -4px; }
+.sheet .meta b { color: #4A6563; font-weight: 600; }
+.sheet .hbar { height: 9px; border-radius: 5px; background: #E6EEED; overflow: hidden; }
+.sheet .hbar i { display: block; height: 100%; }
+.sheet table.t { font-size: 13px; }
+.sheet table.t td { padding: 5px 8px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Kesiapan Merawat</h1><p>Preparedness for Caregiving Scale untuk pelaku rawat</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btn-new" type="button">Penilaian baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Isi data</button><button type="button" data-view="preview">Ringkasan &amp; cetak</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="idhint" id="idhint" hidden></div>
+    <details class="card"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+    <div id="sections"></div>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Ringkasan">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+    </div>
+    <div class="pages" id="pages"><div class="pagebox"><div class="sheet" id="sheet1"></div></div></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/instrumen.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, esc, today } = KKLP;
+  const { radios, card, pill, fmt1, has, num, none, identity, head, foot, notes } = KKLP_I;
+  const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
+
+  const ITEMS = [
+    "merawat kebutuhan fisik anggota keluarga Anda?",
+    "merawat kebutuhan emosionalnya?",
+    "mencari tahu dan mengatur layanan yang ia perlukan?",
+    "menghadapi stres dalam merawat?",
+    "membuat kegiatan merawat terasa menyenangkan bagi Anda dan dirinya?",
+    "menanggapi dan menangani keadaan darurat yang menyangkut dirinya?",
+    "mendapatkan bantuan dan informasi yang Anda perlukan dari layanan kesehatan?",
+    "Secara keseluruhan, seberapa siap Anda merawat anggota keluarga Anda?",
+  ];
+  const SHORT = ["Kebutuhan fisik", "Kebutuhan emosional", "Mengatur layanan", "Menghadapi stres", "Membuat perawatan menyenangkan", "Menangani keadaan darurat", "Mendapat bantuan dan informasi", "Kesiapan secara keseluruhan"];
+  const OPT = [["0", "Tidak siap sama sekali"], ["1", "Kurang siap"], ["2", "Cukup siap"], ["3", "Siap"], ["4", "Sangat siap"]];
+  $("#sections").innerHTML =
+    card("id", 0, "Identitas", identity() + `<div class="grid2">
+      <div class="field"><label for="f-cg">Nama pelaku rawat (caregiver)</label><input type="text" id="f-cg" data-k="cgNama" placeholder="mis. Dewi"></div>
+      <div class="field"><label for="f-hub">Hubungan dengan pasien</label><input type="text" id="f-hub" data-k="cgHub" placeholder="mis. anak"></div></div>
+      <p class="note">Identitas pasien di atas adalah anggota keluarga yang dirawat. Kuesioner diisi oleh pelaku rawat.</p>`, true) +
+    card("items", 0, "Preparedness for Caregiving Scale", `<p class="intro">Seberapa siap menurut Anda, diri Anda untuk…</p>` +
+      ITEMS.map((t, i) => `<div class="q"><div class="qt"><b>${i + 1}.</b> ${t}</div>${radios("pc" + i, OPT)}</div>`).join("") +
+      `<div class="score" id="sc"></div>`, true) +
+    card("cat", 0, "Catatan dan rencana", `<div class="field"><label for="f-cat">Kebutuhan edukasi dan dukungan untuk pelaku rawat</label><textarea id="f-cat" data-k="catatan" rows="4"></textarea></div>
+      <div class="field"><label for="f-foot">Kaki halaman</label><input type="text" id="f-foot" data-k="footer"></div>`);
+  function render(st) {
+    const vals = ITEMS.map((_, i) => (has(st, "pc" + i) ? num(st, "pc" + i) : null)), ans = vals.filter((v) => v !== null);
+    const mean = ans.length ? ans.reduce((a, b) => a + b, 0) / ans.length : null;
+    const low = vals.map((v, i) => (v !== null && v <= 1 ? i : -1)).filter((i) => i >= 0);
+    $("#sc").innerHTML = mean === null ? `<span class="note">0/8 terjawab</span>` : `<span>Rerata <b>${fmt1(mean)}</b> dari 4 (${ans.length}/8 terjawab)</span>` + (low.length ? `<span>Kurang siap pada butir ${low.map((i) => i + 1).join(", ")}</span>` : "");
+    $("#cnt-items").textContent = mean === null ? "" : fmt1(mean) + " / 4";
+    const bar = (v) => v === null ? none : `<div class="hbar"><i style="width:${v / 4 * 100}%;background:${v <= 1 ? "#B3363F" : v === 2 ? "#C98A00" : "#3E9B3A"}"></i></div>`;
+    const table = `<table class="t"><colgroup><col style="width:28px"><col><col style="width:150px"><col style="width:120px"></colgroup>
+      <thead><tr><th class="c">No</th><th>Seberapa siap Anda untuk…</th><th>Jawaban</th><th></th></tr></thead><tbody>` +
+      ITEMS.map((t, i) => `<tr><td class="c">${i + 1}</td><td>${esc(t.replace(/^Secara keseluruhan, seberapa siap Anda /, "secara keseluruhan, "))}</td><td style="${vals[i] !== null && vals[i] <= 1 ? "color:#B3363F;font-weight:700" : ""}">${vals[i] === null ? none : vals[i] + " · " + OPT[vals[i]][1]}</td><td style="vertical-align:middle">${bar(vals[i])}</td></tr>`).join("") +
+      `<tr class="tot"><td></td><td>Rerata (0–4; makin tinggi makin siap)</td><td colspan="2">${mean === null ? "–" : fmt1(mean)}</td></tr></tbody></table>`;
+    const lowBox = mean === null ? "" : `<div class="box">${low.length ? `<b>Area yang perlu dukungan (jawaban kurang siap atau tidak siap):</b><ul>${low.map((i) => `<li>${SHORT[i]}</li>`).join("")}</ul>` : "<b>Tidak ada butir dengan jawaban kurang siap atau tidak siap.</b>"}</div>`;
+    $("#sheet1").innerHTML = `<div class="pg">${head(st, "Kesiapan Merawat", "Preparedness for Caregiving Scale", [["Pelaku rawat", [st.cgNama, st.cgHub].filter(Boolean).join(", ")]])}
+      <div class="result">${mean === null ? `<div class="big muted">–</div><div>belum diisi</div>` : `<div class="big">${fmt1(mean)}<small> / 4</small></div><div><b>Rerata skor kesiapan</b><div class="eq">${ans.length}/8 butir terjawab · tidak ada titik potong baku; bandingkan antar waktu</div></div>`}</div>
+      <section>${table}</section>
+      ${lowBox}
+      ${notes(st, "catatan", "Catatan dan Rencana")}
+      ${foot(st, "Preparedness for Caregiving Scale (Archbold, Stewart, Greenlick &amp; Harvath 1990). Terjemahan tidak resmi.")}</div>`;
+  }
+  function defaults() { return { tanggal: today(), footer: "Kesiapan Merawat - " + DOKTER }; }
+  function sample() {
+    const s = { nama: "Bapak S (contoh)", rm: "12-34-56", usia: "64", cgNama: "Dewi", cgHub: "anak",
+      catatan: "Edukasi tanda bahaya stroke dan langkah kegawatdaruratan; latih cara memindahkan pasien; rujuk ke kelompok dukungan pelaku rawat; atur jadwal bergantian dengan Ibu R dan Budi." };
+    [3, 2, 2, 1, 2, 1, 3, 2].forEach((v, i) => { s["pc" + i] = String(v); });
+    return s;
+  }
+  KKLP.docTool({ key: "kesiapan-merawat", defaults, sample, render });
+
+})();
+</script>
+</body>
+</html>
