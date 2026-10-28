@@ -1,17 +1,20 @@
-# Genogram & Ekomap Keluarga
+# Perangkat Kedokteran Keluarga
 
-Alat untuk menyusun **genogram**, **peta keluarga**, dan **ekomap** dengan simbol standar, untuk asesmen keluarga di layanan primer dan presentasi kasus.
+Alat bantu kedokteran keluarga layanan primer, bisa dipakai di ponsel maupun komputer.
 
-**Buka aplikasi:** https://dokterren.github.io/genogram/
+**Buka:** https://dokterren.github.io/genogram/
 
-## Fitur
-- Input anggota keluarga lewat formulir; genogram tergambar otomatis per generasi
-- Penanda penyakit pada kuadran simbol, pasien indeks, serumah, caregiver (CG), pengambil keputusan (PK)
-- Peta keluarga (dekat, sangat lekat, renggang, konflik, terputus) dan ekomap (kuat, sedang, lemah, menekan, arah dukungan)
-- Lembar presentasi A4 mendatar
-- Unduh PNG, SVG, PDF (4 halaman), dan file kasus (.json)
+| Alat | Fungsi |
+|---|---|
+| [Genogram & Ekomap](https://dokterren.github.io/genogram/genogram.html) | Genogram dengan simbol standar, peta keluarga, ekomap, lembar presentasi kasus A4; unduh PNG/SVG/PDF |
+| [Rencana Sehat Saya](https://dokterren.github.io/genogram/rencana-sehat.html) | Isi rencana perawatan pasien di layar, cetak atau unduh PDF A4 (2 halaman) |
+| [Catatan Pemantauan Metabolik](https://dokterren.github.io/genogram/pemantauan-metabolik.html) | Lembar 15 hari dengan identitas, jadwal, dan target pasien tercetak; bisa juga dicetak polos |
+| [Indeks Kesehatan Menyeluruh](https://dokterren.github.io/genogram/lmwphi.html) | Kuesioner LMWPHI v4 (terjemahan Bahasa Indonesia) dengan skor otomatis enam pilar, grafik, dan laporan PDF |
 
 ## Privasi data pasien
-Aplikasi ini tidak mempunyai server. Semua data yang diketik hanya tersimpan di browser perangkat pengguna dan tidak pernah dikirim ke mana pun. Gunakan "Simpan file kasus" untuk menyimpan atau memindahkan kasus.
+Situs ini tidak mempunyai server. Semua data yang diketik hanya tersimpan di browser perangkat pengguna dan tidak pernah dikirim ke mana pun. Gunakan tombol simpan file data (.json) untuk mencadangkan atau memindahkan data ke perangkat lain.
+
+## Catatan
+Penilaian LMWPHI mengikuti *LMWPHI Version 4 Administrator Instructions and Scoring* © American College of Lifestyle Medicine. Terjemahan Bahasa Indonesia tidak resmi dan belum melalui validasi lintas bahasa.
 
 Disusun oleh dr. Caren Andika Surbakti, Sp.KKLP.

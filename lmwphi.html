@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Indeks Kesehatan Menyeluruh LM</title>
+<meta name="description" content="Kuesioner Lifestyle Medicine Whole Person Health Index v4 (Bahasa Indonesia) dengan penilaian otomatis dan grafik hasil.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+/* ---- questionnaire UI ---- */
+details.card { scroll-margin-top: 120px; }
+.q { display: flex; flex-direction: column; gap: 7px; padding: 10px 0; border-top: 1px dashed var(--line); }
+.q:first-of-type { border-top: 0; padding-top: 2px; }
+.qt { font-size: 15px; line-height: 1.4; }
+.qt .desc { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; }
+.qt .qn { color: var(--muted); font-weight: 700; margin-right: 4px; }
+.intro { font-size: 13.5px; color: var(--muted); margin: 0; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; }
+.opts.scale { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 4px; }
+.opts.days { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
+.opt { position: relative; cursor: pointer; }
+.opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.opt span { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 40px; padding: 6px 8px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 14px; line-height: 1.2; }
+.opts.scale .opt span, .opts.days .opt span { padding: 6px 0; font-weight: 700; }
+.opt:hover span { border-color: var(--teal); }
+.opt input:checked + span { background: var(--teal); border-color: var(--teal); color: var(--teal-ink); font-weight: 700; }
+.opt input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+.anch { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.multi { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px; }
+.multi .opt span { justify-content: flex-start; text-align: left; }
+.prio-row { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px; align-items: center; }
+.prio-row b { font-size: 14px; }
+.progress { position: sticky; top: 0; z-index: 3; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+.bar { height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--teal); width: 0; transition: width .2s; }
+.progress .row { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--muted); }
+.unans { font-size: 12.5px; color: var(--muted); }
+.unans a { color: var(--teal); }
+.done-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; text-align: center; display: none; }
+body.patient .done-card { display: block; }
+body.patient .preview-col, body.patient .viewtoggle, body.patient #card-arsip, body.patient #btn-sample, body.patient #btn-archive { display: none !important; }
+body.patient .layout { grid-template-columns: minmax(0, 760px); justify-content: center; }
+body.patient .form-col { display: flex !important; }
+.modechip { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; cursor: pointer; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: var(--surface); }
+@media (max-width: 560px) { .opts.scale { grid-template-columns: repeat(6, minmax(0, 1fr)); } .opts.days { grid-template-columns: repeat(4, minmax(0, 1fr)); } .prio-row { grid-template-columns: 1fr; gap: 3px; } }
+
+/* ---- report sheet ---- */
+.sheet .pg { width: 794px; height: 1123px; box-sizing: border-box; padding: 32px 42px 26px; display: flex; flex-direction: column; gap: 12px; font-family: 'Source Sans 3', 'Segoe UI', sans-serif; color: #16302E; }
+.sheet .rh { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; border-bottom: 3px solid #013A40; padding-bottom: 8px; }
+.sheet .eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: .14em; color: #028090; }
+.sheet h1 { margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 25px; line-height: 1.12; color: #013A40; }
+.sheet .sub { font-size: 12.5px; color: #4A6563; }
+.sheet .idb { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 2px 8px; width: 230px; font-size: 12.5px; }
+.sheet .idb span { color: #4A6563; font-weight: 600; }
+.sheet .idb b { border-bottom: 1px solid #8FB3AF; min-height: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet table.sum { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.sheet table.sum td { border: 1.5px solid #16302E; padding: 6px 10px; font-size: 14px; vertical-align: top; }
+.sheet table.sum td.k { font-weight: 700; width: 46%; }
+.sheet table.sum td.vv { text-align: center; font-weight: 700; font-size: 15px; }
+.sheet .charts { display: grid; grid-template-columns: 300px minmax(0, 1fr); border: 1.5px solid #16302E; border-top: 0; }
+.sheet .charts > div { padding: 8px 10px; }
+.sheet .charts > div + div { border-left: 1.5px solid #16302E; }
+.sheet .ctitle { text-align: center; font-weight: 700; font-size: 14.5px; color: #3D4F4D; }
+.sheet .scale4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-radius: 6px; overflow: hidden; font-size: 11.5px; position: relative; }
+.sheet .scale4 div { padding: 4px 6px; color: #FFFFFF; font-weight: 700; text-align: center; }
+.sheet table.det { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12.5px; }
+.sheet table.det th { background: #028090; color: #FFFFFF; text-align: left; padding: 5px 7px; font-size: 12px; border: 1px solid #028090; }
+.sheet table.det td { border: 1px solid #9FC9C4; padding: 4px 7px; vertical-align: top; line-height: 1.3; }
+.sheet table.det td.n { text-align: center; font-weight: 700; }
+.sheet .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.sheet .flags { background: #FCF1E4; border-radius: 6px; padding: 7px 12px; font-size: 12.5px; color: #6B3F0C; }
+.sheet .flags ul { margin: 3px 0 0; padding-left: 18px; }
+.sheet .flags.ok { background: #EAF5F4; color: #013A40; }
+.sheet .foot { margin-top: auto; display: flex; justify-content: space-between; gap: 16px; font-size: 10.5px; color: #4A6563; border-top: 1px solid #CFE5E2; padding-top: 5px; }
+.sheet .ans { columns: 2; column-gap: 22px; font-size: 11.5px; line-height: 1.3; }
+.sheet .ans h3 { font-size: 12.5px; color: #013A40; margin: 8px 0 3px; break-after: avoid; font-family: 'Source Serif 4', Georgia, serif; }
+.sheet .ans h3:first-child { margin-top: 0; }
+.sheet .ans p { margin: 0 0 4px; break-inside: avoid; }
+.sheet .ans p b { display: block; color: #16302E; font-weight: 700; }
+.sheet .ans p span { color: #4A6563; }
+.sheet .incomplete { font-size: 13px; color: #A1232F; font-weight: 700; text-align: center; padding: 30px 10px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Indeks Kesehatan Menyeluruh</h1><p>Lifestyle Medicine Whole Person Health Index v4 · penilaian otomatis</p></div>
+  </div>
+  <div class="actions">
+    <label class="modechip" title="Sembunyikan hasil saat pasien mengisi sendiri"><input type="checkbox" id="mode-pasien"> Mode pasien</label>
+    <button class="btn" id="btn-new" type="button">Kuesioner baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Pertanyaan</button><button type="button" data-view="preview">Hasil</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="progress" aria-live="polite">
+      <div class="row"><span id="prog-t">0 dari 29 pertanyaan terjawab</span><span id="prog-s"></span></div>
+      <div class="bar"><i id="prog-bar"></i></div>
+      <div class="unans" id="unans"></div>
+    </div>
+    <div class="idhint" id="idhint" hidden></div>
+    <details class="card" id="card-arsip"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+    <div id="qsections"></div>
+    <div class="done-card"><b>Terima kasih telah mengisi kuesioner ini.</b><br>Serahkan kembali perangkat kepada petugas atau dokter Anda.</div>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Hasil">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+      <span class="sp"></span>
+      <span class="note">Halaman 1: hasil dan grafik · Halaman 2: jawaban pasien</span>
+    </div>
+    <div class="pages" id="pages"><div class="pagebox"><div class="sheet" id="sheet1"></div></div><div class="pagebox"><div class="sheet" id="sheet2"></div></div></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, esc, fmtDate, today, store } = KKLP;
+  const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
+
+  /* ======================= questions (Bahasa Indonesia translation of LMWPHI v4) ======================= */
+  const FREQ_FOOD = ["Tidak pernah", "Kurang dari sekali seminggu", "1–3 kali seminggu", "4–6 kali seminggu", "1–2 kali sehari", "3 kali sehari atau lebih"];
+  const FREQ_2W = ["Tidak sama sekali", "Beberapa hari", "Lebih dari separuh jumlah hari", "Hampir setiap hari"];
+  const FREQ_SUB = ["Setiap hari atau hampir setiap hari", "Setiap minggu", "Kurang dari sekali seminggu", "Tidak sama sekali"];
+  const SLEEP_H = ["Kurang dari 5 jam", "Sekitar 5–6 jam", "Sekitar 6–7 jam", "Sekitar 7–8 jam", "Sekitar 8–9 jam", "Sekitar 9–10 jam", "Lebih dari 10 jam"];
+  const PRIOR = ["Menghindari zat berisiko (rokok, narkoba, alkohol)", "Keterhubungan (dengan orang lain, komunitas, Tuhan, atau alam)", "Nutrisi", "Aktivitas fisik", "Tidur", "Manajemen stres"];
+  const PRIOR_SHORT = ["Menghindari zat berisiko", "Keterhubungan", "Nutrisi", "Aktivitas fisik", "Tidur", "Manajemen stres"];
+  const FOODS = [
+    ["n1", "Buah", "Apel, pisang, jeruk, melon, beri, atau buah lainnya"],
+    ["n2", "Sayur", "Sayuran hijau yang dimasak maupun mentah, brokoli, wortel, kentang, kacang polong, atau sayuran lain maupun hidangan yang sebagian besar terbuat dari sayuran"],
+    ["n3", "Biji-bijian utuh atau produknya", "Oat, beras merah, roti atau sereal gandum utuh, tepung gandum utuh, atau produk lain yang 100% biji-bijian utuh"],
+    ["n4", "Roti putih, pasta putih, nasi putih, atau makanan dari tepung putih", "Makanan apa pun yang terbuat dari tepung putih atau nasi putih, seperti roti, tortila, kue, camilan, pasta, atau makanan lain"],
+    ["n5", "Makanan kemasan/siap saji, restoran, bawa pulang, atau cepat saji", "Hidangan atau makanan apa pun yang dibeli dalam keadaan dingin atau beku, segala jenis makanan siap santap, makanan bawa pulang, atau makanan dari restoran"],
+    ["n6", "Makanan dan minuman manis", "Sereal sarapan atau yoghurt dengan tambahan gula, permen, hidangan penutup lain, makanan lain dengan tambahan gula, atau minuman manis apa pun, termasuk minuman bersoda, teh atau kopi manis, minuman energi, dll."],
+    ["n7", "Makanan asin", "Keripik, kerupuk, atau camilan asin lainnya; sup kalengan, saus, saus salad, atau makanan lain dengan tambahan garam"],
+    ["n8", "Gorengan", "Makanan yang digoreng seperti kentang goreng, onion ring, ayam atau daging goreng, olahan kentang goreng, roti goreng, tempura, atau gorengan lainnya"],
+  ];
+  const PROTEIN = ["Daging sapi, babi, atau kambing/domba", "Daging olahan: daging iris (lunch meat), bacon, hot dog, atau sosis", "Unggas atau hidangan berbahan unggas",
+    "Daging hewan buruan (mis. rusa)", "Ikan, kerang, atau hidangan laut", "Kacang-kacangan, kacang polong, lentil, atau produk olahannya (mis. tahu, tempe)",
+    "Kacang (mis. kacang tanah, almon), biji-bijian, atau alpukat", "Susu dan produk olahan susu", "Telur atau hidangan berbahan telur"];
+  const PLANT_PROTEIN = [5, 6];
+  const MOOD = [["s1", "Kurang berminat atau kurang senang dalam melakukan berbagai hal"], ["s2", "Merasa murung, sedih, atau putus asa"],
+    ["s3", "Merasa tidak mampu menangani berbagai urusan dalam hidup Anda"], ["s4", "Merasa stres atau kewalahan"]];
+  const SUBST = [
+    ["z1", "Dalam 4 minggu terakhir, <b>seberapa sering Anda menggunakan tembakau atau produk nikotin lain</b>, termasuk rokok, rokok elektrik, vape, tembakau hirup (snuff), tembakau kunyah, atau bentuk tembakau lainnya?", "Tembakau/nikotin"],
+    ["z2", "Dalam 4 minggu terakhir, <b>seberapa sering dalam satu hari Anda minum 5 gelas minuman beralkohol atau lebih</b> (bila Anda laki-laki) <b>atau 4 gelas atau lebih</b> (bila Anda perempuan)?", "Minum alkohol berlebihan"],
+    ["z3", "Dalam 4 minggu terakhir, <b>seberapa sering Anda menggunakan obat resep</b> hanya untuk mendapatkan efek atau sensasinya, baik dengan dosis melebihi yang diresepkan maupun obat yang tidak diresepkan untuk Anda?", "Penyalahgunaan obat resep"],
+    ["z4", "Dalam 4 minggu terakhir, <b>seberapa sering Anda menggunakan ganja/kanabis</b> atau produk apa pun yang terbuat darinya?", "Ganja/kanabis"],
+    ["z5", "Dalam 4 minggu terakhir, <b>seberapa sering Anda menggunakan narkoba</b>, termasuk kokain atau crack, heroin, metamfetamin (sabu), halusinogen, ekstasi/MDMA, atau zat serupa lainnya?", "Narkoba"],
+  ];
+
+  let qn = 0;
+  const radios = (k, labels, cls, values) => `<div class="opts ${cls || ""}" role="radiogroup">${labels.map((l, i) => `<label class="opt"><input type="radio" name="${k}" data-k="${k}" value="${values ? values[i] : i}"><span>${l}</span></label>`).join("")}</div>`;
+  const Q = (id, text, body, desc) => `<div class="q" id="q-${id}"><div class="qt"><span class="qn">${++qn}.</span>${text}${desc ? `<span class="desc">${desc}</span>` : ""}</div>${body}</div>`;
+  const scale = (k, text, lo, mid, hi) => Q(k, text, radios(k, Array.from({ length: 11 }, (_, i) => String(i)), "scale") + `<div class="anch"><span>0 · ${lo}</span><span>${mid}</span><span>${hi} · 10</span></div>`);
+  const prioSel = (k, label) => `<div class="prio-row"><b>${label}</b><select data-k="${k}" aria-label="${label}"><option value="">— pilih —</option>${PRIOR.map((p, i) => `<option value="${i}">${p}</option>`).join("")}</select></div>`;
+  const card = (id, title, inner) => `<details class="card" id="sec-${id}" open><summary>${title} <span class="count" id="cnt-${id}"></span></summary><div class="card-body">${inner}</div></details>`;
+
+  $("#qsections").innerHTML =
+    card("identitas", "Identitas", `
+      <div class="field"><label for="f-nama">Nama</label><input type="text" id="f-nama" data-k="nama" data-id="1"></div>
+      <div class="grid3">
+        <div class="field"><label for="f-rm">No. RM</label><input type="text" id="f-rm" data-k="rm" data-id="1"></div>
+        <div class="field"><label for="f-usia">Usia (th)</label><input type="text" inputmode="numeric" id="f-usia" data-k="usia" maxlength="3"></div>
+        <div class="field"><label for="f-tgl">Tanggal</label><input type="date" id="f-tgl" data-k="tanggal"></div>
+      </div>
+      <div class="field"><span class="lbl-ui">Jenis kelamin</span>${radios("jk", ["Laki-laki", "Perempuan"], "", ["L", "P"])}</div>
+      <p class="intro">Survei ini menanyakan berbagai aspek kehidupan yang dapat memengaruhi kesehatan, sekitar 10 menit. Tidak ada jawaban benar atau salah; jawablah dengan jujur dan seakurat mungkin.</p>`, true) +
+    card("kesiapan", "Kesiapan untuk berubah", `<p class="intro">Seberapa siap dan yakin Anda untuk melakukan perubahan gaya hidup demi meningkatkan kesehatan?</p>` +
+      scale("r1", "Pada skala 0–10, <b>seberapa siap Anda untuk melakukan atau mempertahankan perubahan gaya hidup guna meningkatkan kesehatan?</b>", "Tidak siap", "Cukup siap", "Sangat siap") +
+      scale("r2", "Pada skala 0–10, <b>seberapa yakin Anda mampu melakukan atau mempertahankan perubahan gaya hidup guna meningkatkan kesehatan?</b>", "Tidak yakin", "Cukup yakin", "Sangat yakin"), true) +
+    card("motivasi", "Motivasi", `<p class="intro">Ketika memikirkan upaya meningkatkan kesehatan, aspek kehidupan mana yang menjadi prioritas Anda untuk diperbaiki? Pilih tiga yang berbeda.</p>` +
+      Q("prio", "<b>Urutkan tiga prioritas Anda</b>", `<div class="rows">${prioSel("p1", "Prioritas 1")}${prioSel("p2", "Prioritas 2")}${prioSel("p3", "Prioritas 3")}</div>`)) +
+    card("nutrisi", "Nutrisi", `<p class="intro"><b>Pertimbangkan apa yang biasanya Anda makan selama 4 minggu terakhir.</b> Tidak apa-apa bila suatu makanan termasuk dalam lebih dari satu kategori. Perkiraan terbaik lebih baik daripada mengosongkan jawaban.</p>
+      <p class="intro">Selama empat minggu terakhir, seberapa sering Anda makan atau minum hal-hal berikut?</p>` +
+      FOODS.map(([k, name, desc]) => Q(k, `<b>${name}</b>`, radios(k, FREQ_FOOD), desc)).join("") +
+      Q("prot", "<b>Sumber protein apa saja yang sering Anda makan (2–3 kali seminggu atau lebih)?</b> Pilih semua yang sesuai.",
+        `<div class="multi">${PROTEIN.map((p, i) => `<label class="opt"><input type="checkbox" data-k="pr${i}"><span>${p}</span></label>`).join("")}</div>`)) +
+    card("tidur", "Tidur", Q("t1", "Selama 2 minggu terakhir, <b>rata-rata berapa jam Anda tidur dalam periode 24 jam?</b>", radios("t1", SLEEP_H)) +
+      Q("t2", "Selama 2 minggu terakhir, <b>seberapa sering Anda merasa lelah atau sulit tetap terjaga saat melakukan kegiatan rutin di siang hari?</b>", radios("t2", FREQ_2W))) +
+    card("aktivitas", "Olahraga dan aktivitas fisik",
+      Q("a1", "Dalam seminggu rata-rata selama 30 hari terakhir, <b>berapa hari per minggu Anda melakukan olahraga intensitas sedang hingga berat</b> (seperti jalan cepat, berlari, menari, berenang, bersepeda, atau aktivitas lain yang membuat Anda berkeringat ringan hingga banyak)?", radios("a1", ["0", "1", "2", "3", "4", "5", "6", "7"], "days")) +
+      Q("a2", "Pada hari-hari Anda berolahraga intensitas sedang hingga berat, <b>rata-rata berapa menit Anda berolahraga?</b>", `<div class="field" style="max-width:200px"><input type="number" min="0" max="1440" inputmode="numeric" data-k="a2" aria-label="menit per hari" placeholder="menit"></div><p class="note">Lewati bila jawaban sebelumnya 0 hari.</p>`) +
+      Q("a3", "Selama sebulan terakhir, <b>berapa kali per minggu Anda melakukan aktivitas fisik atau latihan untuk menguatkan otot?</b>", radios("a3", ["0", "1", "2", "3", "4", "5", "6", "7+"], "days"))) +
+    card("stres", "Suasana hati dan stres", `<p class="intro">Selama 2 minggu terakhir, seberapa sering Anda terganggu oleh masalah-masalah berikut?</p>` +
+      MOOD.map(([k, t]) => Q(k, `<b>${t}</b>`, radios(k, FREQ_2W))).join("")) +
+    card("makna", "Makna dan keterhubungan",
+      Q("m1", "Selama 2 minggu terakhir, <b>seberapa sering Anda merasa hidup Anda memiliki tujuan atau makna?</b>", radios("m1", FREQ_2W)) +
+      Q("m2", "Selama 2 minggu terakhir, <b>seberapa sering Anda merasa terhubung dengan suatu jejaring dukungan</b> (mis. komunitas, kegiatan keagamaan atau spiritual, teman/keluarga, alam, yoga, atau meditasi)?", radios("m2", FREQ_2W))) +
+    card("zat", "Penggunaan zat", `<p class="intro">Ingatlah bahwa tidak ada jawaban benar atau salah. <b>Pikirkan 4 minggu terakhir</b> saat menjawab.</p>` +
+      SUBST.map(([k, t]) => Q(k, t, radios(k, FREQ_SUB))).join(""));
+
+  const SECTIONS = { kesiapan: ["r1", "r2"], motivasi: ["p1", "p2", "p3"], nutrisi: FOODS.map((f) => f[0]), tidur: ["t1", "t2"], aktivitas: ["a1", "a2", "a3"], stres: MOOD.map((m) => m[0]), makna: ["m1", "m2"], zat: SUBST.map((s) => s[0]) };
+
+  /* ======================= scoring (ACLM LMWPHI v4 administrator instructions) ======================= */
+  const has = (st, k) => st[k] !== undefined && st[k] !== null && String(st[k]) !== "";
+  const n = (st, k) => Number(st[k]);
+  function needed(st) {
+    // keys still unanswered; minutes only needed when days > 0
+    const miss = [];
+    Object.entries(SECTIONS).forEach(([sec, ks]) => ks.forEach((k) => {
+      if (k === "a2" && has(st, "a1") && n(st, "a1") === 0) return;
+      if (!has(st, k)) miss.push([sec, k]);
+    }));
+    return miss;
+  }
+  function score(st) {
+    const R = { pillars: {} };
+    const done = (ks) => ks.every((k) => has(st, k));
+    // readiness
+    if (done(["r1", "r2"])) { const t = n(st, "r1") + n(st, "r2"); R.readiness = { total: t, scaled: t / 2, higher: t >= 11 }; }
+    R.prio = ["p1", "p2", "p3"].map((k) => (has(st, k) ? PRIOR_SHORT[n(st, k)] : null));
+    // nutrition
+    if (done(SECTIONS.nutrisi)) {
+      const TIMES = [0, 0.5, 2, 5, 10.5, 21];
+      const f = FOODS.map(([k]) => TIMES[n(st, k)]);
+      const prot = PROTEIN.map((_, i) => (st["pr" + i] ? 3 : 0));
+      const total = f.reduce((a, b) => a + b, 0) + prot.reduce((a, b) => a + b, 0);
+      const plant = f[0] + f[1] + f[2] + PLANT_PROTEIN.reduce((a, i) => a + prot[i], 0);
+      const pct = total > 0 ? plant / total * 100 : 0;
+      R.pillars.nutrisi = { raw: pct, rawTxt: pct.toFixed(1) + "% (0–100)", scaled: pct / 10, note: total > 0 ? `Makanan nabati utuh ${pct.toFixed(1)}% dari total frekuensi makan (${plant.toFixed(1)} dari ${total.toFixed(1)} kali/minggu).` : "Tidak ada asupan yang tercatat." };
+    }
+    // physical activity
+    if (has(st, "a1") && has(st, "a3") && (n(st, "a1") === 0 || has(st, "a2"))) {
+      const days = n(st, "a1"), mins = n(st, "a1") === 0 ? 0 : Math.min(Math.max(n(st, "a2") || 0, 0), 300);
+      const weekly = days * mins, str = Math.min(n(st, "a3"), 7);
+      const aer = weekly === 0 ? 0 : weekly < 90 ? 1 : weekly < 150 ? 2 : weekly < 300 ? 3 : 4;
+      const sp = str === 0 ? 0 : str === 1 ? 1 : str === 2 ? 2 : 3;
+      const AER = ["tidak aktif", "rendah, belum cukup", "belum jelas (90–149 menit)", "memenuhi panduan aerobik", "manfaat tambahan (≥ 300 menit)"];
+      const STR = ["tanpa latihan kekuatan", "cukup sedang", "memenuhi panduan kekuatan", "manfaat tambahan"];
+      R.pillars.aktivitas = { raw: aer + sp, rawTxt: (aer + sp) + " / 7", scaled: (aer + sp) / 7 * 10, weekly, aer,
+        note: `Aerobik ${weekly} menit/minggu: ${AER[aer]} (${aer}/4). Latihan kekuatan ${str === 7 ? "7+" : str}×/minggu: ${STR[sp]} (${sp}/3).` };
+    }
+    // sleep
+    if (done(SECTIONS.tidur)) {
+      const hs = [0, 1, 2, 3, 3, 2, 0][n(st, "t1")], ts = [3, 2, 1, 0][n(st, "t2")];
+      R.pillars.tidur = { raw: hs + ts, rawTxt: (hs + ts) + " / 6", scaled: (hs + ts) / 6 * 10, hours: n(st, "t1"),
+        note: `Lama tidur: ${SLEEP_H[n(st, "t1")].toLowerCase()} (${hs}/3). Lelah di siang hari: ${FREQ_2W[n(st, "t2")].toLowerCase()} (${ts}/3).` };
+    }
+    // mood & stress (inverted)
+    if (done(SECTIONS.stres)) {
+      const v = MOOD.map(([k]) => n(st, k)), tot = v.reduce((a, b) => a + b, 0), phq2 = v[0] + v[1];
+      R.phq2 = phq2;
+      R.pillars.stres = { raw: tot, rawTxt: `${tot} / 12 → dibalik ${12 - tot}`, scaled: (12 - tot) / 12 * 10,
+        note: `PHQ-2 = ${phq2}${phq2 >= 2 ? " (≥ 2: lanjutkan dengan PHQ-9)" : ""}. Stres tambahan = ${v[2] + v[3]} / 6.` };
+    }
+    // meaning & connectedness
+    if (done(SECTIONS.makna)) {
+      const t = n(st, "m1") + n(st, "m2");
+      R.pillars.makna = { raw: t, rawTxt: t + " / 6", scaled: t / 6 * 10, note: `Merasa hidup bermakna: ${FREQ_2W[n(st, "m1")].toLowerCase()}. Merasa terhubung dengan jejaring dukungan: ${FREQ_2W[n(st, "m2")].toLowerCase()}.` };
+    }
+    // substance use
+    if (done(SECTIONS.zat)) {
+      const v = SUBST.map(([k]) => n(st, k)), t = v.reduce((a, b) => a + b, 0);
+      const used = SUBST.map((s, i) => (v[i] < 3 ? `${s[2]} (${FREQ_SUB[v[i]].toLowerCase()})` : null)).filter(Boolean);
+      R.substances = used; R.substVals = v;
+      R.pillars.zat = { raw: t, rawTxt: t + " / 15", scaled: t / 15 * 10, note: used.length ? "Menggunakan: " + used.join("; ") + "." : "Tidak menggunakan zat berisiko dalam 4 minggu terakhir." };
+    }
+    const keys = ["nutrisi", "aktivitas", "tidur", "stres", "makna", "zat"];
+    R.complete = keys.every((k) => R.pillars[k]);
+    if (R.complete) {
+      R.sum = keys.reduce((a, k) => a + R.pillars[k].scaled, 0);
+      R.lifestyle = R.sum / 60 * 100;
+      const L = Math.round(R.lifestyle);
+      R.cat = L >= 76 ? 3 : L >= 51 ? 2 : L >= 26 ? 1 : 0;
+    }
+    return R;
+  }
+  const PILLARS = [
+    ["nutrisi", "Nutrisi", "#8CC63F"], ["aktivitas", "Aktivitas fisik", "#00A6E0"], ["tidur", "Tidur", "#F2D200"],
+    ["stres", "Manajemen stres", "#FFB000"], ["makna", "Keterhubungan", "#C0272D"], ["zat", "Menghindari zat berisiko", "#7030A0"],
+  ];
+  const CATS = [["0–25", "Perilaku kesehatan berisiko tinggi", "#B3363F"], ["26–50", "Perilaku kesehatan suboptimal", "#D9822B"], ["51–75", "Perilaku kesehatan sedang", "#C9A400"], ["76–100", "Perilaku kesehatan optimal", "#3E9B3A"]];
+
+  /* ======================= charts (inline SVG) ======================= */
+  function pie(pct) {
+    const cx = 120, cy = 92, r = 74, a = Math.max(0, Math.min(100, pct)) / 100 * Math.PI * 2;
+    const pt = (ang) => [cx + r * Math.sin(ang), cy - r * Math.cos(ang)];
+    const [x1, y1] = pt(a), big = a > Math.PI ? 1 : 0;
+    let s = `<svg viewBox="0 0 240 214" width="240" height="214" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif">`;
+    if (pct >= 99.95) s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#8CC63F"/>`;
+    else if (pct <= 0.05) s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#A6A6A6"/>`;
+    else s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#A6A6A6"/><path d="M${cx} ${cy} L${cx} ${cy - r} A${r} ${r} 0 ${big} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="#8CC63F"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>`;
+    const lab = (ang, txt) => { const [lx, ly] = [cx + r * 0.62 * Math.sin(ang), cy - r * 0.62 * Math.cos(ang)]; return `<text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" font-size="12" fill="#3D4F4D" text-anchor="middle">${txt}</text>`; };
+    const P = Math.round(pct);
+    if (P > 0) s += lab(a / 2, P + "%");
+    if (P < 100) s += lab(a + (Math.PI * 2 - a) / 2, (100 - P) + "%");
+    s += `<rect x="8" y="186" width="10" height="10" fill="#8CC63F"/><text x="23" y="195" font-size="11.5" fill="#3D4F4D">Perilaku sehat</text>`;
+    s += `<rect x="112" y="186" width="10" height="10" fill="#A6A6A6"/><text x="127" y="195" font-size="11.5" fill="#3D4F4D">Ruang perbaikan</text></svg>`;
+    return s;
+  }
+  function bars(R) {
+    const W = 400, H = 250, l = 34, t = 16, b = 74, ch = H - t - b, cw = W - l - 6, bw = 34;
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif">`;
+    for (let v = 0; v <= 10; v++) { const y = t + ch - v / 10 * ch; s += `<line x1="${l}" y1="${y}" x2="${W - 6}" y2="${y}" stroke="#E2E8E7" stroke-width="1"/><text x="${l - 5}" y="${y + 3.5}" font-size="9.5" fill="#5C6F6D" text-anchor="end">${v.toFixed(2)}</text>`; }
+    PILLARS.forEach(([k, name, col], i) => {
+      const slot = cw / 6, x = l + slot * i + (slot - bw) / 2, p = R.pillars[k];
+      if (p) {
+        const v = Math.max(0, Math.min(10, p.scaled)), h = v / 10 * ch, y = t + ch - h;
+        s += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${Math.max(h, 0.8).toFixed(1)}" fill="${col}"/>`;
+        s += `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 4).toFixed(1)}" font-size="10.5" fill="#3D4F4D" text-anchor="middle">${v.toFixed(2)}</text>`;
+      } else s += `<text x="${(x + bw / 2).toFixed(1)}" y="${t + ch - 6}" font-size="10" fill="#A1232F" text-anchor="middle">belum</text>`;
+      const lx = x + bw / 2 + 4, ly = t + ch + 10;
+      s += `<text x="${lx.toFixed(1)}" y="${ly}" font-size="10.5" fill="#3D4F4D" text-anchor="end" transform="rotate(-38 ${lx.toFixed(1)} ${ly})">${name}</text>`;
+    });
+    s += `<line x1="${l}" y1="${t + ch}" x2="${W - 6}" y2="${t + ch}" stroke="#9FB3B1" stroke-width="1"/></svg>`;
+    return s;
+  }
+
+  /* ======================= report sheets ======================= */
+  function idBox(st) {
+    const jk = st.jk === "L" ? "Laki-laki" : st.jk === "P" ? "Perempuan" : "";
+    return `<div class="idb"><span>Nama</span><b>${esc(st.nama || "")}</b><span>No. RM</span><b>${esc(st.rm || "")}</b>
+      <span>Usia / JK</span><b>${esc([st.usia ? st.usia + " th" : "", jk].filter(Boolean).join(" · "))}</b><span>Tanggal</span><b>${esc(fmtDate(st.tanggal, "short"))}</b></div>`;
+  }
+  function footer(st, page) {
+    return `<div class="foot"><span>Penilaian menurut LMWPHI v4 Administrator Instructions and Scoring © American College of Lifestyle Medicine. Terjemahan Bahasa Indonesia tidak resmi.<br>${esc(st.footer || "")}</span><span style="white-space:nowrap;font-weight:700">Halaman ${page} / 2</span></div>`;
+  }
+  function render(st) {
+    const R = score(st), miss = needed(st);
+    // ---------- progress in the form ----------
+    const total = Object.values(SECTIONS).reduce((a, ks) => a + ks.length, 0) - (has(st, "a1") && n(st, "a1") === 0 ? 1 : 0);
+    const answered = total - miss.length;
+    $("#prog-t").textContent = `${answered} dari ${total} pertanyaan terjawab`;
+    $("#prog-bar").style.width = (answered / total * 100) + "%";
+    $("#prog-s").textContent = R.complete ? "Skor gaya hidup: " + Math.round(R.lifestyle) : "";
+    Object.entries(SECTIONS).forEach(([sec, ks]) => {
+      const m = miss.filter((x) => x[0] === sec).length, t = ks.length - (sec === "aktivitas" && has(st, "a1") && n(st, "a1") === 0 ? 1 : 0);
+      const c = $("#cnt-" + sec); if (c) c.textContent = (t - m) + " / " + t + (m === 0 ? " ✓" : "");
+    });
+    const secNames = { kesiapan: "Kesiapan", motivasi: "Motivasi", nutrisi: "Nutrisi", tidur: "Tidur", aktivitas: "Aktivitas", stres: "Stres", makna: "Makna", zat: "Zat" };
+    const missSec = [...new Set(miss.map((x) => x[0]))];
+    $("#unans").innerHTML = missSec.length ? "Belum lengkap: " + missSec.map((s) => `<a href="#sec-${s}" data-jump="${s}">${secNames[s]}</a>`).join(", ") : "Semua pertanyaan sudah terjawab.";
+    const prioDup = ["p1", "p2", "p3"].map((k) => st[k]).filter((v) => v !== undefined && v !== "");
+    $$('select[data-k^="p"]').forEach((sel) => { $$("option", sel).forEach((o) => { o.disabled = o.value !== "" && o.value !== sel.value && prioDup.includes(o.value); }); });
+
+    // ---------- page 1: results ----------
+    const ready = R.readiness ? (R.readiness.scaled % 1 ? R.readiness.scaled.toFixed(1) : String(R.readiness.scaled)) : "–";
+    const prio = R.prio.filter(Boolean);
+    let p1 = `<div class="pg">
+      <div class="rh"><div><div class="eyebrow">LIFESTYLE MEDICINE</div><h1>Hasil Indeks Kesehatan Menyeluruh</h1><div class="sub">Lifestyle Medicine Whole Person Health Index · Versi 4 · Bahasa Indonesia</div></div>${idBox(st)}</div>
+      <div>
+        <table class="sum"><tr><td class="k">Kesiapan untuk berubah (0–10)</td><td class="vv">${ready}${R.readiness ? `<div style="font-size:12px;font-weight:600;color:#4A6563">${R.readiness.higher ? "kesiapan lebih tinggi" : "kesiapan lebih rendah"} (total ${R.readiness.total}/20)</div>` : ""}</td></tr>
+        <tr><td class="k">Paling ingin diperbaiki</td><td class="vv" style="line-height:1.45">${prio.length ? prio.map((p) => esc(p)).join("<br>") : "–"}</td></tr></table>
+        <div class="charts">
+          <div><div class="ctitle">Skor Gaya Hidup Keseluruhan: ${R.complete ? Math.round(R.lifestyle) : "–"}</div><div style="display:flex;justify-content:center;margin-top:4px">${R.complete ? pie(R.lifestyle) : `<div class="incomplete">Lengkapi semua pertanyaan<br>untuk menghitung skor</div>`}</div></div>
+          <div><div class="ctitle">Perilaku Kesehatan Utama</div><div style="display:flex;justify-content:center">${bars(R)}</div></div>
+        </div>
+      </div>`;
+    if (R.complete) {
+      const pos = Math.max(0, Math.min(100, R.lifestyle));
+      p1 += `<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px"><b style="font-size:14px;color:${CATS[R.cat][2]}">${CATS[R.cat][1]}</b><span style="font-size:12px;color:#4A6563">Skor ${Math.round(R.lifestyle)} dari 100 (jumlah skor pilar ${R.sum.toFixed(2)} / 60)</span></div>
+        <div style="position:relative"><div class="scale4">${CATS.map((c) => `<div style="background:${c[2]}">${c[0]}</div>`).join("")}</div>
+        <div style="position:absolute;top:-5px;left:calc(${pos}% - 6px);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #16302E"></div></div></div>`;
+    }
+    p1 += `<table class="det"><colgroup><col style="width:24%"><col style="width:17%"><col style="width:9%"><col></colgroup>
+      <thead><tr><th>Pilar</th><th>Skor mentah</th><th>0–10</th><th>Keterangan</th></tr></thead><tbody>` +
+      PILLARS.map(([k, name, col]) => { const p = R.pillars[k]; return `<tr><td><span class="sw" style="background:${col}"></span>${name}</td><td>${p ? esc(p.rawTxt) : "belum lengkap"}</td><td class="n">${p ? p.scaled.toFixed(2) : "–"}</td><td>${p ? esc(p.note) : ""}</td></tr>`; }).join("") +
+      `</tbody></table>`;
+    const flags = [];
+    if (R.phq2 != null && R.phq2 >= 2) flags.push(`<b>Skrining depresi:</b> PHQ-2 = ${R.phq2}. Panduan ACLM: skor 2 atau lebih → lanjutkan dengan PHQ-9 (tidak dinilai dalam indeks ini).`);
+    if (R.substVals && R.substVals.some((v) => v < 3)) flags.push(`<b>Penggunaan zat:</b> ${esc(R.substances.join("; "))}.`);
+    if (R.pillars.tidur && R.pillars.tidur.hours <= 1) flags.push("<b>Tidur:</b> rata-rata kurang dari 6 jam per 24 jam.");
+    if (R.pillars.tidur && R.pillars.tidur.hours === 6) flags.push("<b>Tidur:</b> rata-rata lebih dari 10 jam per 24 jam.");
+    if (R.pillars.aktivitas && R.pillars.aktivitas.weekly === 0) flags.push("<b>Aktivitas fisik:</b> tidak ada olahraga intensitas sedang–berat.");
+    if (R.complete || flags.length) p1 += `<div class="flags${flags.length ? "" : " ok"}"><b>Perlu perhatian</b>${flags.length ? `<ul>${flags.map((f) => `<li>${f}</li>`).join("")}</ul>` : ": tidak ada tanda khusus dari jawaban."}</div>`;
+    p1 += `<div style="font-size:11.5px;color:#4A6563;line-height:1.35">Skor tiap pilar diskalakan ke 0–10 lalu dijumlahkan (maks. 60) dan dikonversi ke 0–100. Rentang: 76–100 optimal, 51–75 sedang, 26–50 suboptimal, 0–25 berisiko tinggi. Kesiapan = (kesiapan + keyakinan) / 2; total 11–20 menunjukkan kesiapan lebih tinggi. Motivasi tidak dinilai.</div>`;
+    p1 += footer(st, 1) + `</div>`;
+    $("#sheet1").innerHTML = p1;
+
+    // ---------- page 2: answers ----------
+    const A = (k, labels) => (has(st, k) ? labels[n(st, k)] : "—");
+    const item = (q, a) => `<p><b>${q}</b><span>${esc(a)}</span></p>`;
+    const strip = (h) => h.replace(/<[^>]+>/g, "");
+    let ans = `<h3>Kesiapan untuk berubah</h3>` + item("Seberapa siap (0–10)", has(st, "r1") ? st.r1 : "—") + item("Seberapa yakin (0–10)", has(st, "r2") ? st.r2 : "—") +
+      `<h3>Motivasi</h3>` + ["p1", "p2", "p3"].map((k, i) => item("Prioritas " + (i + 1), has(st, k) ? PRIOR[n(st, k)] : "—")).join("") +
+      `<h3>Nutrisi (4 minggu terakhir)</h3>` + FOODS.map(([k, name]) => item(name, A(k, FREQ_FOOD))).join("") +
+      item("Sumber protein ≥ 2–3×/minggu", PROTEIN.filter((_, i) => st["pr" + i]).join("; ") || "tidak ada yang dipilih") +
+      `<h3>Tidur (2 minggu terakhir)</h3>` + item("Rata-rata tidur per 24 jam", A("t1", SLEEP_H)) + item("Lelah/sulit terjaga di siang hari", A("t2", FREQ_2W)) +
+      `<h3>Olahraga dan aktivitas fisik</h3>` + item("Hari olahraga sedang–berat per minggu", has(st, "a1") ? st.a1 + " hari" : "—") +
+      item("Menit per hari olahraga", has(st, "a1") && n(st, "a1") === 0 ? "tidak berlaku" : has(st, "a2") ? st.a2 + " menit" : "—") +
+      item("Latihan penguatan otot per minggu", has(st, "a3") ? (n(st, "a3") >= 7 ? "7 kali atau lebih" : st.a3 + " kali") : "—") +
+      `<h3>Suasana hati dan stres (2 minggu terakhir)</h3>` + MOOD.map(([k, t]) => item(t, A(k, FREQ_2W))).join("") +
+      `<h3>Makna dan keterhubungan</h3>` + item("Merasa hidup memiliki tujuan atau makna", A("m1", FREQ_2W)) + item("Merasa terhubung dengan jejaring dukungan", A("m2", FREQ_2W)) +
+      `<h3>Penggunaan zat (4 minggu terakhir)</h3>` + SUBST.map(([k, , short]) => item(short, A(k, FREQ_SUB))).join("");
+    void strip;
+    $("#sheet2").innerHTML = `<div class="pg"><div class="rh"><div><div class="eyebrow">LIFESTYLE MEDICINE</div><h1 style="font-size:21px">Jawaban Kuesioner</h1><div class="sub">Indeks Kesehatan Menyeluruh · Versi 4</div></div>${idBox(st)}</div><div class="ans">${ans}</div>${footer(st, 2)}</div>`;
+  }
+
+  /* ======================= sample answers ======================= */
+  function sample() {
+    // a sedentary, stressed office worker who eats out often (similar to ACLM appendix case 2)
+    const s = { nama: "Bapak R (contoh)", rm: "00-11-22", usia: "54", jk: "L", r1: "8", r2: "7", p1: "0", p2: "3", p3: "5",
+      n1: "1", n2: "2", n3: "0", n4: "4", n5: "4", n6: "4", n7: "3", n8: "3", pr0: true, pr1: true, pr2: true, pr4: true,
+      t1: "1", t2: "2", a1: "0", a3: "0", s1: "1", s2: "1", s3: "2", s4: "3", m1: "1", m2: "1", z1: "0", z2: "1", z3: "3", z4: "3", z5: "3" };
+    return s;
+  }
+  function defaults() { return { tanggal: today(), footer: DOKTER }; }
+
+  const tool = KKLP.docTool({ key: "lmwphi", defaults, sample, render });
+
+  /* jump links + patient mode */
+  $("#unans").addEventListener("click", (ev) => { const a = ev.target.closest("[data-jump]"); if (!a) return; ev.preventDefault(); const d = $("#sec-" + a.dataset.jump); d.open = true; d.scrollIntoView({ behavior: "smooth", block: "start" }); });
+  const mode = $("#mode-pasien");
+  function applyMode() { document.body.classList.toggle("patient", mode.checked); store.set("lmwphi-mode", mode.checked); }
+  mode.checked = !!store.get("lmwphi-mode", false); applyMode();
+  mode.addEventListener("change", () => { applyMode(); if (!mode.checked) KKLP.scalePages(); });
+  void tool;
+})();
+</script>
+</body>
+</html>

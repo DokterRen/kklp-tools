@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catatan Pemantauan Metabolik</title>
+<meta name="description" content="Siapkan Catatan Pemantauan Metabolik 15 hari dengan identitas, jadwal, dan target pasien sudah terisi, lalu cetak A4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+/* ---- printed design (from the Catatan Pemantauan Metabolik A4 layout) ---- */
+.sheet .pg { width: 794px; height: 1123px; box-sizing: border-box; padding: 24px 38px 22px 38px; display: flex; flex-direction: column; gap: 6px; font-family: 'Source Sans 3', 'Segoe UI', sans-serif; color: #16302E; background: #FFFFFF; }
+.sheet .ln { display: flex; align-items: flex-end; border-bottom: 1.25px solid #8FB3AF; height: 20px; white-space: nowrap; overflow: hidden; font-size: 13px; padding: 0 2px 2px; box-sizing: border-box; min-width: 0; }
+.sheet .lbl { font-size: 12.5px; font-weight: 600; color: #4A6563; white-space: nowrap; }
+.sheet .fld { display: flex; align-items: flex-end; gap: 8px; min-width: 0; }
+.sheet .sec { display: flex; align-items: center; gap: 10px; margin: 0 0 5px 0; }
+.sheet .num { width: 24px; height: 24px; border-radius: 12px; background: #013A40; color: #FFFFFF; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sheet .st { font-family: 'Source Serif 4', Georgia, serif; font-size: 17px; font-weight: 700; color: #013A40; margin: 0; }
+.sheet .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 12px; }
+.sheet .card { background: #F4FAF9; border-radius: 6px; padding: 4px 10px 5px 10px; }
+.sheet .ct { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 700; }
+.sheet .fq { font-size: 12px; font-weight: 600; color: #4A6563; text-align: right; }
+.sheet .card ul { margin: 2px 0 0 0; padding-left: 15px; }
+.sheet .card li { font-size: 12px; line-height: 1.27; margin: 0; }
+.sheet .alert { display: grid; grid-template-columns: 1.25fr 1fr; gap: 12px; }
+.sheet .ab { border-radius: 6px; overflow: hidden; }
+.sheet .ab .ah { color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 3px 10px; }
+.sheet .ab ul, .sheet .ab ol { margin: 3px 0 4px 0; padding: 0 10px 0 26px; }
+.sheet .ab li { font-size: 12px; line-height: 1.3; }
+.sheet .cb { display: inline-block; width: 12px; height: 12px; border: 1.4px solid #16302E; border-radius: 2px; box-sizing: border-box; flex-shrink: 0; margin-bottom: 2px; }
+.sheet .cb.on::after { left: 2.5px; top: -1.5px; }
+.sheet .plan { background: #FCF1E4; border-radius: 6px; padding: 4px 10px 6px 10px; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
+.sheet .pr { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 3px 10px; font-size: 12px; color: #6B3F0C; }
+.sheet .pr .k { font-weight: 700; width: 132px; }
+.sheet .pr .o { display: inline-flex; align-items: flex-end; gap: 4px; font-weight: 600; }
+.sheet .pr .f { display: inline-flex; align-items: flex-end; gap: 4px; font-weight: 600; }
+.sheet .pr .f i { display: inline-block; min-width: 36px; border-bottom: 1.2px solid #C9A27A; height: 15px; font-style: normal; font-size: 12.5px; line-height: 14px; padding: 0 2px; white-space: nowrap; color: #16302E; font-weight: 700; }
+.sheet .cal { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 6px; flex-grow: 1; }
+.sheet .day { border: 1px solid #9FC9C4; border-radius: 5px; display: flex; flex-direction: column; overflow: hidden; }
+.sheet .dh { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: #EAF5F4; padding: 2px 7px; border-bottom: 1px solid #CFE5E2; }
+.sheet .dn { font-size: 14px; font-weight: 700; color: #013A40; white-space: nowrap; }
+.sheet .dt { display: flex; align-items: flex-end; gap: 3px; font-size: 11.5px; color: #4A6563; font-weight: 600; flex-grow: 1; justify-content: flex-end; }
+.sheet .dt i { display: inline-block; flex-grow: 1; max-width: 60px; min-width: 24px; border-bottom: 1px solid #8FB3AF; height: 13px; font-style: normal; font-size: 11.5px; line-height: 12px; color: #16302E; font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; }
+.sheet .db { display: flex; flex-direction: column; justify-content: space-evenly; flex-grow: 1; padding: 0 7px 3px 7px; }
+.sheet .r { display: flex; align-items: flex-end; gap: 5px; min-height: 19px; }
+.sheet .r b { font-size: 12px; font-weight: 600; color: #4A6563; white-space: nowrap; }
+.sheet .r i { flex-grow: 1; border-bottom: 1px solid #9FC9C4; height: 17px; min-width: 0; }
+.sheet .r em { font-size: 11px; font-style: normal; color: #4A6563; white-space: nowrap; }
+.sheet .sub { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+.sheet .leg { font-size: 12px; color: #4A6563; margin-top: 4px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Catatan Pemantauan Metabolik</h1><p>Lembar 15 hari dengan identitas, jadwal, dan target pasien sudah tercetak</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btn-new" type="button">Formulir baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Isi data</button><button type="button" data-view="preview">Pratinjau &amp; cetak</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="idhint" id="idhint" hidden></div>
+
+    <details class="card"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+
+    <details class="card" open><summary>Identitas</summary><div class="card-body">
+      <div class="field"><label for="f-nama">Nama pasien</label><input type="text" id="f-nama" data-k="nama" data-id="1"></div>
+      <div class="grid2">
+        <div class="field"><label for="f-rm">No. RM</label><input type="text" id="f-rm" data-k="rm" data-id="1"></div>
+        <div class="field"><label for="f-tgl">Tanggal mulai</label><input type="date" id="f-tgl" data-k="tanggal"></div>
+      </div>
+      <div class="checks"><label><input type="checkbox" data-k="autoTgl"> Isi tanggal di 15 kotak hari otomatis (hari berturut-turut mulai tanggal di atas)</label></div>
+      <div class="field"><label for="f-telp">Telepon / WA untuk dihubungi</label><input type="tel" id="f-telp" data-k="telp"></div>
+    </div></details>
+
+    <details class="card" open><summary>Jadwal pemeriksaan</summary><div class="card-body">
+      <div class="field"><span class="lbl-ui">Tekanan darah</span>
+        <div class="checks">
+          <label><input type="radio" name="td" data-k="td" value=""> Tidak dicentang</label>
+          <label><input type="radio" name="td" data-k="td" value="harian"> Setiap hari</label>
+          <label><input type="radio" name="td" data-k="td" value="3x"> 3 kali seminggu</label>
+          <label><input type="radio" name="td" data-k="td" value="7h"> 7 hari sebelum kontrol</label>
+        </div>
+      </div>
+      <div class="field"><span class="lbl-ui">Gula darah</span>
+        <div class="checks">
+          <label><input type="checkbox" data-k="gHarian"> Setiap hari</label>
+          <label style="gap:6px">atau <input type="text" data-k="gKali" maxlength="3" style="width:52px" aria-label="kali seminggu"> kali seminggu</label>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" data-k="gPuasa"> Puasa</label>
+          <label><input type="checkbox" data-k="g2j"> 2 jam sesudah makan</label>
+        </div>
+      </div>
+    </div></details>
+
+    <details class="card" open><summary>Target pasien</summary><div class="card-body">
+      <p class="note">Ditulis singkat, mis. &lt;130/80, 80–130, &lt;180, 65 kg.</p>
+      <div class="grid3">
+        <div class="field"><label for="t1">Tekanan darah</label><input type="text" id="t1" data-k="tTD" maxlength="14"></div>
+        <div class="field"><label for="t2">Gula puasa</label><input type="text" id="t2" data-k="tGP" maxlength="12"></div>
+        <div class="field"><label for="t3">Gula 2 jam</label><input type="text" id="t3" data-k="tG2" maxlength="12"></div>
+        <div class="field"><label for="t4">Berat badan</label><input type="text" id="t4" data-k="tBB" maxlength="12"></div>
+        <div class="field"><label for="t5">Lingkar perut</label><input type="text" id="t5" data-k="tLP" maxlength="12"></div>
+        <div class="field"><label for="t6">Kolesterol</label><input type="text" id="t6" data-k="tKol" maxlength="12"></div>
+        <div class="field"><label for="t7">Asam urat</label><input type="text" id="t7" data-k="tAU" maxlength="12"></div>
+      </div>
+    </div></details>
+
+    <details class="card"><summary>Pengaturan cetak</summary><div class="card-body">
+      <div class="field"><label for="f-foot">Kaki halaman</label><input type="text" id="f-foot" data-k="footer"></div>
+    </div></details>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Pratinjau A4">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+      <span class="sp"></span>
+      <span class="note">Kosongkan semua isian untuk mencetak lembar polos.</span>
+    </div>
+    <div class="pages" id="pages"></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, fmtDate, today } = KKLP;
+  const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
+  const day = (n) => `<div class="day"><div class="dh"><span class="dn">${n}</span><span class="dt">tgl <i class="v" data-v="_d${n}"></i></span></div><div class="db">
+      <div class="r"><b>TD pagi</b><i></i></div><div class="r"><b>TD malam</b><i></i></div>
+      <div class="r"><b>Gula</b><i></i><em>P / 2J</em></div><div class="r"><span class="cb"></span><b style="font-weight:400">Lupa obat</b><i></i></div></div></div>`;
+  const T = (label, k) => `<span class="f">${label} <i class="v" data-v="${k}"></i></span>`;
+  $("#pages").innerHTML = `<div class="pagebox"><div class="sheet"><div class="pg">
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;border-bottom:3px solid #013A40;padding-bottom:7px">
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <div style="font-size:11.5px;font-weight:700;letter-spacing:0.14em;color:#028090">KEDOKTERAN KELUARGA LAYANAN PRIMER</div>
+      <h1 style="margin:0;font-family:'Source Serif 4',Georgia,serif;font-size:26px;line-height:1.1;color:#013A40">Catatan Pemantauan Metabolik</h1>
+      <div style="font-size:12.5px;color:#4A6563;white-space:nowrap">Tekanan darah, gula darah, kolesterol, asam urat, berat badan, dan lingkar perut</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3px;width:200px;flex-shrink:0">
+      <div class="fld"><span class="lbl" style="width:52px">Nama</span><span class="ln v" data-v="nama" data-src="nama" data-fit="8.5" style="flex-grow:1"></span></div>
+      <div class="fld"><span class="lbl" style="width:52px">No. RM</span><span class="ln v" data-v="rm" data-src="rm" data-fit="9" style="flex-grow:1"></span></div>
+      <div class="fld"><span class="lbl" style="width:52px">Tanggal</span><span class="ln v" data-v="_tanggal" data-fit="9" style="flex-grow:1"></span></div>
+    </div>
+  </header>
+  <section>
+    <div class="sec"><div class="num">1</div><h2 class="st">Cara Memeriksa</h2></div>
+    <div class="cards">
+      <div class="card" style="border-top:3px solid #028090"><div class="ct"><span style="color:#028090">Tekanan darah</span><span class="fq">sesuai jadwal di bagian 3</span></div><ul><li>Istirahat duduk 5 menit; 30 menit sebelumnya tanpa rokok, kopi, atau olahraga.</li><li>Duduk bersandar, kaki menapak, manset di lengan atas setinggi jantung. Pakai lengan yang sama (bila lemah sebelah, lengan yang sehat).</li><li>Ukur 2 kali berjarak 1 menit, catat rata-ratanya.</li></ul></div>
+      <div class="card" style="border-top:3px solid #A85F12"><div class="ct"><span style="color:#A85F12">Tes darah ujung jari</span><span class="fq">sesuai jadwal dari dokter</span></div><ul><li>Cuci tangan dengan sabun, keringkan. Pastikan strip sesuai jenis tes dan belum kedaluwarsa.</li><li>Tusuk sisi ujung jari, teteskan darah ke strip; jangan memeras terlalu kuat. Buang jarum di botol tertutup.</li><li>Gula puasa: tidak makan minimal 8 jam. 2 jam sesudah makan: dihitung dari suapan pertama.</li></ul></div>
+      <div class="card" style="border-top:3px solid #3B7EA6"><div class="ct"><span style="color:#3B7EA6">Berat badan</span><span class="fq">1 kali seminggu</span></div><ul><li>Pagi setelah buang air kecil, sebelum makan, tanpa alas kaki.</li><li>Timbangan yang sama, hari yang sama setiap minggu.</li></ul></div>
+      <div class="card" style="border-top:3px solid #1F9D8B"><div class="ct"><span style="color:#1F9D8B">Lingkar perut</span><span class="fq">1 kali seminggu</span></div><ul><li>Berdiri tegak, perut terbuka, bernapas biasa.</li><li>Pita sejajar lantai, di tengah antara rusuk terbawah dan tulang panggul; baca di akhir buang napas.</li></ul></div>
+    </div>
+  </section>
+  <section>
+    <div class="sec"><div class="num">2</div><h2 class="st">Kapan Harus Waspada</h2></div>
+    <div class="alert">
+      <div class="ab" style="border:1.5px solid #A1232F">
+        <div class="ah" style="background:#A1232F">Hubungi dokter / segera ke IGD bila:</div>
+        <ul>
+          <li><b>Hubungi dokter:</b> TD 180/110 atau lebih 2 kali ukur tanpa keluhan; gula darah di atas 300 dua kali berturut-turut, atau di bawah 70 lebih dari sekali seminggu.</li>
+          <li><b>Segera ke IGD:</b> TD tinggi disertai sakit kepala hebat, nyeri dada, sesak, lemah separuh badan, atau bicara pelo; gula darah rendah yang tidak membaik atau sulit dibangunkan.</li>
+        </ul>
+        <div class="fld" style="padding:0 10px 5px 10px"><span class="lbl">Telepon / WA</span><span class="ln v" data-v="telp" data-src="telp" data-fit="9" style="flex-grow:1;height:17px"></span></div>
+      </div>
+      <div class="ab" style="border:1.5px solid #A85F12">
+        <div class="ah" style="background:#A85F12">Bila gula darah di bawah 70</div>
+        <ol>
+          <li>Tanda: gemetar, keringat dingin, lemas. Segera minum 1/2 gelas (150 ml) teh manis atau jus, atau 1 sendok makan gula dalam air.</li>
+          <li>Periksa ulang setelah 15 menit. Masih di bawah 70? Ulangi langkah 1.</li>
+          <li>Setelah membaik, makan camilan atau makanan utama, lalu catat di kotak hari itu.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+  <section style="flex-grow:1;display:flex;flex-direction:column">
+    <div class="sec"><div class="num">3</div><h2 class="st">Hasil Pemeriksaan Saya</h2><span style="font-size:12px;font-weight:700;color:#026A73;background:#E3F3F1;border-radius:10px;padding:2px 9px">Bawa catatan ini saat kontrol</span></div>
+    <div class="plan">
+      <div class="pr"><span class="k">Jadwal tekanan darah</span><span class="o"><span class="cb" data-c="td=harian"></span>Setiap hari</span><span class="o"><span class="cb" data-c="td=3x"></span>3 kali seminggu</span><span class="o"><span class="cb" data-c="td=7h"></span>7 hari sebelum kontrol</span></div>
+      <div class="pr"><span class="k">Jadwal gula darah</span><span class="o"><span class="cb" data-c="gHarian"></span>Setiap hari</span>${T("atau", "gKali")}<span class="f" style="margin-left:-6px">kali seminggu</span><span class="o"><span class="cb" data-c="gPuasa"></span>Puasa</span><span class="o"><span class="cb" data-c="g2j"></span>2 jam sesudah makan</span></div>
+      <div class="pr"><span class="k">Target saya</span>${T("TD", "tTD")}${T("Gula puasa", "tGP")}${T("2 jam", "tG2")}${T("BB", "tBB")}${T("LP", "tLP")}${T("Kol", "tKol")}${T("AU", "tAU")}</div>
+    </div>
+    <div class="cal">${Array.from({ length: 15 }, (_, i) => day(i + 1)).join("")}</div>
+    <div class="sub">
+      <div class="day"><div class="dh"><span class="dn" style="font-size:12.5px">Minggu 1</span><span class="dt">tgl <i></i></span></div><div class="db"><div class="r"><b>Berat badan</b><i></i><em>kg</em></div><div class="r"><b>Lingkar perut</b><i></i><em>cm</em></div></div></div>
+      <div class="day"><div class="dh"><span class="dn" style="font-size:12.5px">Minggu 2</span><span class="dt">tgl <i></i></span></div><div class="db"><div class="r"><b>Berat badan</b><i></i><em>kg</em></div><div class="r"><b>Lingkar perut</b><i></i><em>cm</em></div></div></div>
+      <div class="day" style="border-color:#E2C29E"><div class="dh" style="background:#FCF1E4;border-bottom-color:#EBD3B6"><span class="dn" style="font-size:12.5px;color:#6B3F0C">Cek lab</span><span class="dt">tgl <i></i></span></div><div class="db"><div class="r"><b>Kolesterol</b><i></i><em>mg/dL</em></div><div class="r"><b>Asam urat</b><i></i><em>mg/dL</em></div></div></div>
+      <div class="day" style="border:1.5px dashed #013A40"><div class="dh" style="background:#013A40;border-bottom-color:#013A40"><span class="dn" style="font-size:12.5px;color:#FFFFFF">Ditinjau dokter</span></div><div class="db"><div class="r"><b>Tanggal</b><i></i></div><div class="r"><b>Nama dan Paraf</b><i></i></div></div></div>
+    </div>
+    <div class="leg"><b style="color:#013A40">TD</b> = tekanan darah (mmHg) &#183; <b style="color:#013A40">Gula</b> (mg/dL): lingkari <b>P</b> = puasa, <b>2J</b> = 2 jam sesudah makan &#183; <b style="color:#013A40">Lupa obat</b>: centang, tulis catatan singkat di garisnya</div>
+  </section>
+  <footer style="display:flex;justify-content:space-between;gap:16px;font-size:11.5px;color:#4A6563;border-top:1px solid #CFE5E2;padding-top:5px">
+    <span data-v="footer"></span><span>Hasil alat di rumah dapat berbeda dengan laboratorium.</span>
+  </footer>
+</div></div></div>`;
+
+  function defaults() { return { tanggal: today(), td: "", footer: "Catatan Pemantauan Metabolik - " + DOKTER }; }
+  function sample() {
+    return { nama: "Bapak Suryanto (contoh)", rm: "12-34-56", telp: "0812-xxxx-xxxx", td: "3x", gKali: "2", gPuasa: true, g2j: true,
+      tTD: "<130/80", tGP: "80–130", tG2: "<180", tBB: "68 kg", tLP: "<90 cm", tKol: "<200", tAU: "<7", autoTgl: true };
+  }
+  function render(st) {
+    const v = Object.assign({}, st, { _tanggal: fmtDate(st.tanggal, "short") });
+    for (let i = 1; i <= 15; i++) {
+      let t = "";
+      if (st.autoTgl && st.tanggal) { const d = new Date(st.tanggal + "T00:00:00"); d.setDate(d.getDate() + i - 1); t = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0"); }
+      v["_d" + i] = t;
+    }
+    $$("#pages [data-v]").forEach((el) => { el.textContent = v[el.dataset.v] == null ? "" : v[el.dataset.v]; });
+    $$("#pages [data-c]").forEach((el) => { const [k, val] = el.dataset.c.split("="); el.classList.toggle("on", val === undefined ? !!st[k] : st[k] === val); });
+  }
+  KKLP.docTool({ key: "pemantauan-metabolik", defaults, sample, render });
+})();
+</script>
+</body>
+</html>
