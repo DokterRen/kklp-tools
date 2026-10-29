@@ -44,9 +44,11 @@
 <script>
 (function () {
   "use strict";
-  /* Add new leaflets here: [category, title, description, file, keywords] */
+  /* Add new leaflets here: [category, title, description, file, keywords, pages] */
   const LEAFLETS = [
-    ["Diabetes", "Indeks Glikemik Makanan", "Nilai IG makanan sehari-hari dalam tiga warna, cara mengatur piring, dan tips menjaga gula darah stabil.", "indeks-glikemik.html", "gula darah karbohidrat nasi diet makanan IG DM"],
+    ["Gaya hidup sehat", "6 Pilar Gaya Hidup Sehat", "Yang sehat pada tiap pilar lifestyle medicine: makan, bergerak, tidur, stres, hubungan sosial, dan zat berisiko. Ada kolom langkah kecil pasien.", "enam-pilar.html", "lifestyle medicine nutrisi olahraga aktivitas fisik tidur stres sosial rokok alkohol pencegahan", 1],
+    ["Diabetes", "Indeks Glikemik Makanan", "Nilai IG makanan sehari-hari dalam tiga warna, cara mengatur piring, dan tips menjaga gula darah stabil.", "indeks-glikemik.html", "gula darah karbohidrat nasi diet makanan IG DM", 1],
+    ["Stroke", "Perawatan Stroke di Rumah", "Tanda bahaya SeGeRa Ke RS, obat, makan dan minum aman, posisi, latihan, rumah aman, aktivitas sehari-hari, dan dukungan keluarga.", "stroke-di-rumah.html", "stroke pasca stroke hemiparesis lumpuh separuh keluarga caregiver disfagia tersedak luka tekan jatuh", 2],
   ];
   const cats = ["Semua", ...new Set(LEAFLETS.map((l) => l[0]))];
   let cat = "Semua";
@@ -58,7 +60,7 @@
     const shown = LEAFLETS.filter((l) => (cat === "Semua" || l[0] === cat) && (!t || (l[1] + " " + l[2] + " " + l[4] + " " + l[0]).toLowerCase().includes(t)));
     const groups = [...new Set(shown.map((l) => l[0]))];
     out.innerHTML = groups.length ? groups.map((g) => `<section class="grp"><h2>${esc(g)}</h2><div class="list">${shown.filter((l) => l[0] === g).map((l) =>
-      `<a class="leaf" href="${l[3]}"><h3>${esc(l[1])}</h3><p>${esc(l[2])}</p><span class="meta">A4 · 1 halaman · Buka &amp; cetak →</span></a>`).join("")}</div></section>`).join("")
+      `<a class="leaf" href="${l[3]}"><h3>${esc(l[1])}</h3><p>${esc(l[2])}</p><span class="meta">A4 · ${l[5] === 2 ? "2 halaman (bolak-balik)" : "1 halaman"} · Buka &amp; cetak →</span></a>`).join("")}</div></section>`).join("")
       : `<p class="empty">Tidak ada leaflet yang cocok.</p>`;
   }
   chips.addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (!b) return; cat = b.dataset.c; draw(); });

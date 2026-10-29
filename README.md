@@ -18,7 +18,7 @@ Alat bantu kedokteran keluarga layanan primer, bisa dipakai di ponsel maupun kom
 | [Rencana Sehat Saya](https://dokterren.github.io/kklp-tools/rencana-sehat.html) | Isi rencana perawatan pasien di layar, cetak atau unduh PDF A4 (2 halaman) |
 | [Catatan Pemantauan Metabolik](https://dokterren.github.io/kklp-tools/pemantauan-metabolik.html) | Lembar 15 hari dengan identitas, jadwal, dan target pasien tercetak; bisa juga dicetak polos |
 | **Materi Edukasi Pasien** | |
-| [Leaflet Edukasi](https://dokterren.github.io/kklp-tools/edukasi/) | Leaflet A4 siap cetak, mis. indeks glikemik makanan; nama pasien dan catatan dokter bisa diisi |
+| [Leaflet Edukasi](https://dokterren.github.io/kklp-tools/edukasi/) | Leaflet A4 siap cetak: 6 pilar gaya hidup sehat, indeks glikemik makanan, perawatan stroke di rumah; nama pasien dan catatan dokter bisa diisi |
 
 ## Privasi data pasien
 Situs ini tidak mempunyai server. Semua data yang diketik hanya tersimpan di browser perangkat pengguna dan tidak pernah dikirim ke mana pun. Gunakan tombol simpan file data (.json) untuk mencadangkan atau memindahkan data ke perangkat lain.
