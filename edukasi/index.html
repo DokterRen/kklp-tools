@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Materi Edukasi Pasien</title>
+<meta name="description" content="Leaflet edukasi pasien siap cetak A4 untuk ruang praktik dokter keluarga.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="../assets/app.css">
+<style>
+.wrap { max-width: 1080px; margin: 0 auto; padding: 18px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 16px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filters input { max-width: 320px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 13px; font-weight: 600; font-size: 14px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--deep); border-color: var(--deep); color: var(--surface); }
+.grp h2 { margin: 0 0 10px; font-family: var(--font-display); font-size: 20px; color: var(--deep); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.leaf { display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; text-decoration: none; color: inherit; transition: border-color .15s; }
+.leaf:hover { border-color: var(--teal); }
+.leaf h3 { margin: 0; font-family: var(--font-display); font-size: 18px; color: var(--deep); line-height: 1.2; }
+.leaf p { margin: 0; font-size: 14px; color: var(--muted); flex: 1; }
+.leaf .meta { font-size: 12.5px; font-weight: 600; color: var(--teal); }
+.empty { color: var(--muted); }
+.soon { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; font-size: 14px; color: var(--ink); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="../" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Materi Edukasi Pasien</h1><p>Leaflet A4 siap cetak di ruang praktik. Nama pasien dan catatan dokter bisa diisi sebelum dicetak.</p></div>
+  </div>
+</header>
+<main class="wrap">
+  <div class="filters">
+    <input type="search" id="q" placeholder="Cari topik, mis. gula, garam, stroke" aria-label="Cari leaflet">
+    <div id="chips" class="filters" role="group" aria-label="Kategori"></div>
+  </div>
+  <div id="out"></div>
+  <div class="soon">Leaflet lain akan ditambahkan secara bertahap.</div>
+</main>
+<script>
+(function () {
+  "use strict";
+  /* Add new leaflets here: [category, title, description, file, keywords] */
+  const LEAFLETS = [
+    ["Diabetes", "Indeks Glikemik Makanan", "Nilai IG makanan sehari-hari dalam tiga warna, cara mengatur piring, dan tips menjaga gula darah stabil.", "indeks-glikemik.html", "gula darah karbohidrat nasi diet makanan IG DM"],
+  ];
+  const cats = ["Semua", ...new Set(LEAFLETS.map((l) => l[0]))];
+  let cat = "Semua";
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const chips = document.getElementById("chips"), q = document.getElementById("q"), out = document.getElementById("out");
+  function draw() {
+    chips.innerHTML = cats.map((c) => `<button type="button" class="chip" aria-pressed="${c === cat}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
+    const t = q.value.trim().toLowerCase();
+    const shown = LEAFLETS.filter((l) => (cat === "Semua" || l[0] === cat) && (!t || (l[1] + " " + l[2] + " " + l[4] + " " + l[0]).toLowerCase().includes(t)));
+    const groups = [...new Set(shown.map((l) => l[0]))];
+    out.innerHTML = groups.length ? groups.map((g) => `<section class="grp"><h2>${esc(g)}</h2><div class="list">${shown.filter((l) => l[0] === g).map((l) =>
+      `<a class="leaf" href="${l[3]}"><h3>${esc(l[1])}</h3><p>${esc(l[2])}</p><span class="meta">A4 · 1 halaman · Buka &amp; cetak →</span></a>`).join("")}</div></section>`).join("")
+      : `<p class="empty">Tidak ada leaflet yang cocok.</p>`;
+  }
+  chips.addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (!b) return; cat = b.dataset.c; draw(); });
+  q.addEventListener("input", draw);
+  draw();
+})();
+</script>
+</body>
+</html>
