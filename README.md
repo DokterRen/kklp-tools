@@ -14,6 +14,9 @@ Alat bantu kedokteran keluarga layanan primer, bisa dipakai di ponsel maupun kom
 | [Indeks Barthel](https://dokterren.github.io/kklp-tools/barthel.html) | ADL versi 0–20 dengan kategori ketergantungan |
 | [Kesiapan Merawat](https://dokterren.github.io/kklp-tools/kesiapan-merawat.html) | Preparedness for Caregiving Scale untuk pelaku rawat |
 | [Kepatuhan Minum Obat](https://dokterren.github.io/kklp-tools/kepatuhan-obat.html) | Morisky, Green & Levine 4 butir |
+| **Intervensi Gaya Hidup** |  |
+| [Resep Gaya Hidup](https://dokterren.github.io/kklp-tools/resep-gaya-hidup.html) | Perubahan 6 pilar yang disepakati dan kalender centang 30 hari |
+| [Rencana Aksi Perubahan](https://dokterren.github.io/kklp-tools/rencana-aksi.html) | Hasil konsultasi bergaya coaching untuk satu pilar: kondisi, target, langkah, waktu kontrol |
 | **Catatan untuk Pasien** |  |
 | [Rencana Sehat Saya](https://dokterren.github.io/kklp-tools/rencana-sehat.html) | Isi rencana perawatan pasien di layar, cetak atau unduh PDF A4 (2 halaman) |
 | [Catatan Pemantauan Metabolik](https://dokterren.github.io/kklp-tools/pemantauan-metabolik.html) | Lembar 15 hari dengan identitas, jadwal, dan target pasien tercetak; bisa juga dicetak polos |
