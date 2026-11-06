@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Resep Gaya Hidup</title>
+<meta name="description" content="Resep gaya hidup 30 hari berdasarkan 6 pilar lifestyle medicine, dengan kalender centang harian. Siap cetak A4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+.pill-in { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 6px 8px; align-items: start; }
+.pill-in .bd { width: 24px; height: 24px; border-radius: 12px; color: #FFFFFF; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; margin-top: 3px; }
+.pill-in .rows { gap: 4px; }
+.pill-in b { font-size: 14px; }
+
+/* ---- printed sheet ---- */
+.sheet .pg { width: 794px; height: 1123px; box-sizing: border-box; padding: 38px 42px 32px; display: flex; flex-direction: column; gap: 13px; font-family: 'Source Sans 3', 'Segoe UI', sans-serif; color: #16302E; }
+.sheet .ln { display: flex; align-items: flex-end; height: 24px; border-bottom: 1.2px solid #B9CFCC; white-space: nowrap; overflow: hidden; font-size: 13px; padding: 0 2px 3px; box-sizing: border-box; min-width: 0; color: #16302E; font-weight: 600; }
+.sheet .fl { height: 19px; border-bottom: 1.2px solid #8FB3AF; white-space: nowrap; overflow: hidden; font-size: 13px; font-weight: 600; display: flex; align-items: flex-end; padding: 0 2px 2px; box-sizing: border-box; }
+.sheet .sec { display: flex; align-items: center; gap: 9px; }
+.sheet .num { width: 24px; height: 24px; border-radius: 12px; background: #013A40; color: #FFFFFF; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sheet .st { font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; font-weight: 700; color: #013A40; }
+.sheet .hint { font-size: 12px; color: #4A6563; }
+.sheet .pl { border: 1.5px solid; border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; }
+.sheet .pl.off { opacity: .45; }
+.sheet .ph { display: flex; align-items: center; gap: 8px; }
+.sheet .ph b { font-family: 'Source Serif 4', Georgia, serif; font-size: 15px; }
+.sheet .ph small { font-size: 11.5px; color: #4A6563; font-weight: 600; }
+.sheet .badge { width: 22px; height: 22px; border-radius: 11px; color: #FFFFFF; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sheet .cal { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(5, minmax(0, 1fr)); gap: 6px; flex-grow: 1; min-height: 0; }
+.sheet .day { border: 1px solid #9FC9C4; border-radius: 6px; display: flex; flex-direction: column; overflow: hidden; }
+.sheet .dh { display: flex; justify-content: space-between; align-items: center; gap: 4px; background: #EAF5F4; padding: 3px 7px; border-bottom: 1px solid #CFE5E2; }
+.sheet .dh b { font-size: 14px; color: #013A40; }
+.sheet .dh span { display: flex; align-items: flex-end; gap: 3px; font-size: 10.5px; color: #4A6563; font-weight: 600; }
+.sheet .dh i { display: inline-block; width: 40px; height: 13px; border-bottom: 1px solid #8FB3AF; font-style: normal; font-size: 11px; line-height: 12px; text-align: center; color: #16302E; font-weight: 700; }
+.sheet .day.last { border: 1.5px solid #013A40; }
+.sheet .day.last .dh { background: #013A40; border-bottom-color: #013A40; }
+.sheet .day.last .dh b { color: #FFFFFF; }
+.sheet .day.last .dh span, .sheet .day.last .dh i { color: #DCEEEC; border-bottom-color: #DCEEEC; }
+.sheet .dots { flex-grow: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: space-evenly; justify-items: center; row-gap: 6px; padding: 5px 6px; }
+.sheet .c { width: 22px; height: 22px; border-radius: 11px; border: 1.6px solid; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.sheet .c.off { opacity: .18; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Resep Gaya Hidup</h1><p>Perubahan 6 pilar dan kalender centang 30 hari · A4, 1 halaman</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btn-new" type="button">Formulir baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Isi data</button><button type="button" data-view="preview">Pratinjau &amp; cetak</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="idhint" id="idhint" hidden></div>
+    <details class="card"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+
+    <details class="card" open><summary>Identitas</summary><div class="card-body">
+      <div class="field"><label for="f-nama">Nama pasien</label><input type="text" id="f-nama" data-k="nama" data-id="1"></div>
+      <div class="grid2">
+        <div class="field"><label for="f-rm">No. RM</label><input type="text" id="f-rm" data-k="rm" data-id="1"></div>
+        <div class="field"><label for="f-tgl">Mulai tanggal</label><input type="date" id="f-tgl" data-k="tanggal"></div>
+      </div>
+      <div class="checks"><label><input type="checkbox" data-k="autoTgl"> Isi tanggal di 30 kotak hari otomatis</label></div>
+    </div></details>
+
+    <details class="card" open><summary>Perubahan yang disepakati</summary><div class="card-body">
+      <p class="note">Isi pilar yang dibahas saja. Kosongkan semua untuk mencetak lembar polos.</p>
+      <div id="pillar-inputs" class="rows" style="gap:12px"></div>
+      <div class="checks"><label><input type="checkbox" data-k="dimUnused"> Samarkan pilar yang tidak diisi (di kartu dan kalender)</label></div>
+    </div></details>
+
+    <details class="card"><summary>Kontrol dan dokter</summary><div class="card-body">
+      <div class="grid2">
+        <div class="field"><label for="f-kontrol">Kontrol kembali</label><input type="date" id="f-kontrol" data-k="kontrol"></div>
+        <div class="field"><label for="f-dokter">Dokter</label><input type="text" id="f-dokter" data-k="dokter"></div>
+      </div>
+    </div></details>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Pratinjau A4">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+    </div>
+    <div class="pages" id="pages"><div class="pagebox"><div class="sheet" id="sheet1"></div></div></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, esc, fmtDate, today } = KKLP;
+  const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
+  /* [key, letter, title, subtitle, border, dark, tint, example] — colours match the LMWPHI chart and the 6 Pilar leaflet */
+  const P = [
+    ["m", "M", "Makan sehat", "nutrisi", "#6FA32E", "#3F6B14", "#F7FBF2", "mis. sayur di setiap makan, ganti teh manis dengan teh tawar"],
+    ["g", "G", "Aktif bergerak", "aktivitas fisik", "#0090C4", "#00648A", "#F2FAFD", "mis. jalan cepat 20 menit setiap pagi"],
+    ["t", "T", "Tidur cukup", "tidur yang memulihkan", "#B39600", "#7A6600", "#FDFBEF", "mis. tidur paling lambat pukul 22.00"],
+    ["s", "S", "Kelola stres", "manajemen stres", "#D98E00", "#8F5D00", "#FEF9F0", "mis. napas dalam 5 menit sebelum tidur"],
+    ["h", "H", "Jalin hubungan", "hubungan sosial", "#C0272D", "#8E1C21", "#FDF4F4", "mis. menelepon satu kerabat setiap hari"],
+    ["z", "Z", "Hindari zat berisiko", "rokok, alkohol, NAPZA", "#7030A0", "#4F1F72", "#F8F3FB", "mis. tidak merokok di dalam rumah"],
+  ];
+  $("#pillar-inputs").innerHTML = P.map(([k, L, t, sub, b, d, tint, ex]) => `<div class="pill-in"><span class="bd" style="background:${d}">${L}</span><div class="rows">
+    <b style="color:${d}">${t} <span class="note" style="font-weight:400">· ${sub}</span></b>
+    <input type="text" data-k="${k}1" aria-label="${t}, baris 1" placeholder="${esc(ex)}">
+    <input type="text" data-k="${k}2" aria-label="${t}, baris 2"></div></div>`).join("");
+
+  const L = (k, extra) => `<span class="ln v" data-v="${k}" data-src="${k}" data-fit="8.5" data-wrap="11"${extra || ""}></span>`;
+  const sheet = $("#sheet1");
+  function render(st) {
+    const used = P.map(([k]) => !!((st[k + "1"] || "").trim() || (st[k + "2"] || "").trim()));
+    const dim = st.dimUnused && used.some(Boolean);
+    const card = ([k, Lt, t, sub, b, d, tint], i) => `<div class="pl${dim && !used[i] ? " off" : ""}" style="border-color:${b};background:${tint}"><div class="ph"><span class="badge" style="background:${d}">${Lt}</span><b style="color:${d}">${t}</b><small>${sub}</small></div>${L(k + "1")}${L(k + "2")}</div>`;
+    const dots = P.map(([k, Lt, , , , d], i) => `<span class="c${dim && !used[i] ? " off" : ""}" style="border-color:${d};color:${d}">${Lt}</span>`).join("");
+    let days = "";
+    for (let n = 1; n <= 30; n++) {
+      let t = "";
+      if (st.autoTgl && st.tanggal) { const dt = new Date(st.tanggal + "T00:00:00"); dt.setDate(dt.getDate() + n - 1); t = String(dt.getDate()).padStart(2, "0") + "/" + String(dt.getMonth() + 1).padStart(2, "0"); }
+      days += `<div class="day${n === 30 ? " last" : ""}"><div class="dh"><b>${n}</b><span>tgl <i>${t}</i></span></div><div class="dots">${dots}</div></div>`;
+    }
+    sheet.innerHTML = `<div class="pg">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;border-bottom:3px solid #013A40;padding-bottom:8px">
+        <div style="display:flex;align-items:flex-end;gap:12px">
+          <div style="font-family:'Source Serif 4',Georgia,serif;font-size:52px;font-weight:700;line-height:.9;color:#028090">R/</div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div style="font-size:11.5px;font-weight:700;letter-spacing:.14em;color:#028090">KEDOKTERAN KELUARGA LAYANAN PRIMER</div>
+            <div style="font-family:'Source Serif 4',Georgia,serif;font-size:30px;font-weight:700;line-height:1.05;color:#013A40">Resep Gaya Hidup</div>
+            <div style="font-size:13px;color:#4A6563">Perubahan kecil yang kita sepakati, dijalankan selama 30 hari</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:62px 160px;gap:3px 8px;font-size:12.5px;align-items:end;flex-shrink:0">
+          <span style="color:#4A6563;font-weight:600">Nama</span><span class="fl v" data-v="nama" data-src="nama" data-fit="8.5"></span>
+          <span style="color:#4A6563;font-weight:600">No. RM</span><span class="fl v" data-v="rm" data-src="rm" data-fit="9"></span>
+          <span style="color:#4A6563;font-weight:600">Mulai</span><span class="fl">${esc(fmtDate(st.tanggal, "short"))}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="sec"><span class="num">1</span><span class="st">Perubahan yang saya jalankan</span><span class="hint">isi pilar yang dibahas saja; pilar lain boleh dikosongkan</span></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px">${P.map(card).join("")}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;flex-grow:1;min-height:0">
+        <div class="sec"><span class="num">2</span><span class="st">30 hari perubahan saya</span><span class="hint">beri tanda ✓ pada huruf pilar setiap kali berhasil menjalankannya hari itu</span></div>
+        <div class="cal">${days}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:12px">
+        <div style="background:#FCF1E4;border-radius:8px;padding:7px 11px;font-size:12.5px;line-height:1.35;color:#5A3A00"><b>Terlewat satu hari? Tidak apa-apa.</b> Lanjutkan keesokan harinya. Yang penting bukan sempurna, tetapi terus berjalan. Bawa lembar ini saat kontrol untuk kita lihat bersama.</div>
+        <div style="display:grid;grid-template-columns:92px minmax(0,1fr);gap:4px 8px;align-items:end;font-size:12.5px">
+          <span style="color:#4A6563;font-weight:600">Kontrol kembali</span><span class="fl" style="height:20px">${esc(fmtDate(st.kontrol))}</span>
+          <span style="color:#4A6563;font-weight:600">Dokter</span><span class="fl v" data-v="dokter" data-src="dokter" data-fit="9" style="height:20px;color:#013A40;font-weight:700"></span>
+        </div>
+      </div>
+    </div>`;
+    $$("#sheet1 [data-v]").forEach((el) => { el.textContent = st[el.dataset.v] || ""; });
+  }
+  function defaults() { return { tanggal: today(), dokter: DOKTER, dimUnused: true }; }
+  function sample() {
+    return { nama: "Bapak Hendra (contoh)", rm: "45-67-89", autoTgl: true,
+      m1: "Separuh piring sayur saat makan siang dan malam", m2: "Ganti teh manis dengan teh tawar",
+      g1: "Jalan cepat 20 menit setiap pagi setelah subuh", g2: "Naik tangga ke lantai 2 kantor",
+      t1: "Tidur paling lambat pukul 22.00, ponsel di luar kamar" };
+  }
+  KKLP.docTool({ key: "resep-gaya-hidup", defaults, sample, render });
+})();
+</script>
+</body>
+</html>

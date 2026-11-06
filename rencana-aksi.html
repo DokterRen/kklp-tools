@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rencana Aksi Perubahan</title>
+<meta name="description" content="Hasil konsultasi gaya hidup bergaya coaching untuk satu pilar: kondisi saat ini, target, langkah, dan waktu kontrol. Siap cetak A4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/instrumen.css">
+<style>
+.opts.scale { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 3px; }
+.opts.scale .opt span { padding: 6px 0; justify-content: center; font-weight: 700; min-height: 34px; }
+.opts.pil { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.steprow { display: grid; grid-template-columns: 18px minmax(0, 1.6fr) minmax(0, 1fr); gap: 6px; align-items: center; }
+.steprow .idx { font-size: 12px; color: var(--muted); text-align: right; }
+@media (max-width: 560px) { .opts.scale { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+/* ---- printed sheet ---- */
+.sheet .pg { width: 794px; height: 1123px; box-sizing: border-box; padding: 38px 42px 32px; display: flex; flex-direction: column; gap: 13px; font-family: 'Source Sans 3', 'Segoe UI', sans-serif; color: #16302E; }
+.sheet .ln { display: flex; align-items: flex-end; height: 24px; border-bottom: 1.2px solid #B9CFCC; white-space: nowrap; overflow: hidden; font-size: 13px; padding: 0 2px 3px; box-sizing: border-box; min-width: 0; color: #16302E; font-weight: 600; }
+.sheet .fl { height: 19px; border-bottom: 1.2px solid #8FB3AF; white-space: nowrap; overflow: hidden; font-size: 13px; font-weight: 600; display: flex; align-items: flex-end; padding: 0 2px 2px; box-sizing: border-box; }
+.sheet .sec { display: flex; align-items: center; gap: 9px; }
+.sheet .num { width: 24px; height: 24px; border-radius: 12px; background: #013A40; color: #FFFFFF; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sheet .st { font-family: 'Source Serif 4', Georgia, serif; font-size: 17px; font-weight: 700; color: #013A40; }
+.sheet .hint { font-size: 12px; color: #4A6563; }
+.sheet .lbl { font-size: 12.5px; font-weight: 700; color: #013A40; }
+.sheet .chip { display: flex; align-items: center; gap: 6px; border: 1.5px solid; border-radius: 8px; padding: 6px 7px; font-size: 12.5px; font-weight: 700; line-height: 1.15; }
+.sheet .chip.off { opacity: .4; }
+.sheet .chip.on { box-shadow: 0 0 0 2px currentColor; }
+.sheet .cb { display: inline-block; width: 14px; height: 14px; border: 1.6px solid #16302E; border-radius: 3px; box-sizing: border-box; flex-shrink: 0; }
+.sheet .ruler { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
+.sheet .scale { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 3px; flex-grow: 1; }
+.sheet .scale span { height: 24px; border: 1.2px solid #8FB3AF; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #4A6563; box-sizing: border-box; }
+.sheet .scale span.sel { background: #013A40; border-color: #013A40; color: #FFFFFF; }
+.sheet .box { border: 1.5px solid #9FC9C4; border-radius: 8px; padding: 6px 11px 8px; display: flex; flex-direction: column; background: transparent; font-size: 13px; }
+.sheet .tb { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12.5px; }
+.sheet .tb th { background: #028090; color: #FFFFFF; text-align: left; padding: 4px 8px; border: 1px solid #028090; }
+.sheet .tb td { border: 1px solid #B9CFCC; height: 27px; padding: 0 8px; }
+.sheet .tb td.n { text-align: center; color: #4A6563; font-weight: 700; }
+.sheet .cell { height: 25px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; font-size: 13px; font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Rencana Aksi Perubahan</h1><p>Hasil konsultasi bergaya coaching untuk satu pilar · A4, 1 halaman</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btn-new" type="button">Formulir baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Isi data</button><button type="button" data-view="preview">Pratinjau &amp; cetak</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="idhint" id="idhint" hidden></div>
+    <details class="card"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+    <div id="sections"></div>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Pratinjau A4">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+      <span class="sp"></span>
+      <span class="note">Kolom yang dikosongkan tercetak sebagai garis untuk ditulis tangan.</span>
+    </div>
+    <div class="pages" id="pages"><div class="pagebox"><div class="sheet" id="sheet1"></div></div></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, esc, fmtDate, today } = KKLP;
+  const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
+  const P = [
+    ["m", "Makan sehat", "#6FA32E", "#3F6B14", "#F7FBF2"],
+    ["g", "Aktif bergerak", "#0090C4", "#00648A", "#F2FAFD"],
+    ["t", "Tidur cukup", "#B39600", "#7A6600", "#FDFBEF"],
+    ["s", "Kelola stres", "#D98E00", "#8F5D00", "#FEF9F0"],
+    ["h", "Jalin hubungan", "#C0272D", "#8E1C21", "#FDF4F4"],
+    ["z", "Hindari zat berisiko", "#7030A0", "#4F1F72", "#F8F3FB"],
+  ];
+  const txt = (k, label, ph) => `<input type="text" data-k="${k}" aria-label="${esc(label)}"${ph ? ` placeholder="${esc(ph)}"` : ""}>`;
+  const lines = (k, n, label, ph) => Array.from({ length: n }, (_, i) => txt(k + (i + 1), label + " " + (i + 1), i === 0 ? ph : "")).join("");
+  const scale = (k) => `<div class="opts scale" role="radiogroup">${Array.from({ length: 11 }, (_, i) => `<label class="opt"><input type="radio" name="${k}" data-k="${k}" value="${i}"><span>${i}</span></label>`).join("")}</div>`;
+  const card = (id, no, title, inner, open) => `<details class="card" id="sec-${id}"${open ? " open" : ""}><summary>${no ? `<span class="secno">${no}</span> ` : ""}${title}</summary><div class="card-body">${inner}</div></details>`;
+  $("#sections").innerHTML =
+    card("id", "", "Identitas", `
+      <div class="field"><label for="f-nama">Nama pasien</label><input type="text" id="f-nama" data-k="nama" data-id="1"></div>
+      <div class="grid2"><div class="field"><label for="f-rm">No. RM</label><input type="text" id="f-rm" data-k="rm" data-id="1"></div>
+      <div class="field"><label for="f-tgl">Tanggal</label><input type="date" id="f-tgl" data-k="tanggal"></div></div>`, true) +
+    card("a", "A", "Pilar yang menjadi fokus", `<div class="opts pil" role="radiogroup">${P.map(([k, t, b, d]) => `<label class="opt"><input type="radio" name="pilar" data-k="pilar" value="${k}"><span style="justify-content:flex-start;gap:8px"><i style="width:10px;height:10px;border-radius:5px;background:${d};display:inline-block"></i>${t}</span></label>`).join("")}</div>`, true) +
+    card("b", "B", "Kondisi saat ini", `
+      <div class="field"><span class="lbl-ui">Yang terjadi sekarang</span><div class="rows">${lines("now", 3, "Yang terjadi sekarang", "mis. hampir tidak berolahraga, duduk 9 jam sehari")}</div></div>
+      <div class="field"><span class="lbl-ui">Yang sudah berjalan baik</span><div class="rows">${lines("ok", 3, "Yang sudah berjalan baik", "mis. sudah punya sepatu olahraga, rumah dekat taman")}</div></div>
+      <div class="field"><span class="lbl-ui">Seberapa penting perubahan ini bagi pasien? (0–10)</span>${scale("penting")}</div>`, true) +
+    card("c", "C", "Target", `
+      <div class="field"><span class="lbl-ui">Target (spesifik dan terukur)</span><div class="rows">${lines("tgt", 2, "Target", "mis. jalan cepat 30 menit, 5 hari seminggu, dalam 4 minggu")}</div></div>
+      <div class="field"><label for="f-tanda">Tanda bahwa target tercapai</label>${txt("tanda", "Tanda bahwa target tercapai").replace("<input", '<input id="f-tanda"')}</div>
+      <div class="field"><label for="f-alasan">Mengapa ini penting bagi pasien</label>${txt("alasan", "Alasan").replace("<input", '<input id="f-alasan"')}</div>`) +
+    card("d", "D", "Langkah-langkah", `
+      <div class="rows"><div class="steprow rowhead"><span></span><span>Langkah</span><span>Kapan / seberapa sering</span></div>
+      ${[1, 2, 3, 4].map((i) => `<div class="steprow"><span class="idx">${i}</span>${txt("l" + i, "Langkah " + i, i === 1 ? "mis. siapkan sepatu di dekat pintu" : "")}${txt("w" + i, "Kapan langkah " + i, i === 1 ? "malam sebelumnya" : "")}</div>`).join("")}</div>
+      <div class="field"><span class="lbl-ui">Hambatan yang mungkin muncul</span><div class="rows">${lines("hb", 2, "Hambatan", "mis. hujan pagi hari")}</div></div>
+      <div class="field"><span class="lbl-ui">Cara mengatasinya</span><div class="rows">${lines("cr", 2, "Cara mengatasi", "mis. jalan di dalam rumah atau naik-turun tangga")}</div></div>
+      <div class="field"><span class="lbl-ui">Orang yang mendukung</span><div class="rows">${lines("dk", 2, "Pendukung", "mis. istri ikut jalan pagi")}</div></div>
+      <div class="field"><span class="lbl-ui">Seberapa yakin pasien bisa menjalankannya? (0–10)</span>${scale("yakin")}</div>`) +
+    card("e", "E", "Waktu perubahan dan kontrol", `
+      <div class="grid2"><div class="field"><label for="f-mulai">Mulai tanggal</label><input type="date" id="f-mulai" data-k="mulai"></div>
+      <div class="field"><label for="f-kontrol">Kontrol kembali</label><input type="date" id="f-kontrol" data-k="kontrol"></div></div>
+      <div class="field"><label for="f-eval">Menilai kemajuan setiap</label><input type="text" id="f-eval" data-k="evaluasi" placeholder="mis. hari Minggu malam"></div>
+      <div class="field"><label for="f-dokter">Dokter</label><input type="text" id="f-dokter" data-k="dokter"></div>`);
+
+  const L = (k) => `<span class="ln v" data-v="${k}" data-src="${k}" data-fit="8.5" data-wrap="11"></span>`;
+  const sc = (v) => `<div class="scale">${Array.from({ length: 11 }, (_, i) => `<span class="${v !== undefined && v !== "" && Number(v) === i ? "sel" : ""}">${i}</span>`).join("")}</div>`;
+  function render(st) {
+    const pil = st.pilar || "";
+    const chips = P.map(([k, t, b, d, tint]) => `<div class="chip${pil ? (pil === k ? " on" : " off") : ""}" style="border-color:${b};color:${d};background:${tint}"><span class="cb${pil === k ? " on" : ""}"></span><span>${t}</span></div>`).join("");
+    const steps = [1, 2, 3, 4].map((i) => `<tr><td class="n">${i}</td><td><div class="cell v" data-v="l${i}" data-src="l${i}" data-fit="9"></div></td><td><div class="cell v" data-v="w${i}" data-src="w${i}" data-fit="9"></div></td></tr>`).join("");
+    $("#sheet1").innerHTML = `<div class="pg">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;border-bottom:3px solid #013A40;padding-bottom:8px">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="font-size:11.5px;font-weight:700;letter-spacing:.14em;color:#028090">KEDOKTERAN KELUARGA LAYANAN PRIMER</div>
+          <div style="font-family:'Source Serif 4',Georgia,serif;font-size:30px;font-weight:700;line-height:1.05;color:#013A40">Rencana Aksi Perubahan</div>
+          <div style="font-size:13px;color:#4A6563">Hasil konsultasi gaya hidup · satu pilar, satu fokus</div>
+        </div>
+        <div style="display:grid;grid-template-columns:62px 160px;gap:3px 8px;font-size:12.5px;align-items:end;flex-shrink:0">
+          <span style="color:#4A6563;font-weight:600">Nama</span><span class="fl v" data-v="nama" data-src="nama" data-fit="8.5"></span>
+          <span style="color:#4A6563;font-weight:600">No. RM</span><span class="fl v" data-v="rm" data-src="rm" data-fit="9"></span>
+          <span style="color:#4A6563;font-weight:600">Tanggal</span><span class="fl">${esc(fmtDate(st.tanggal, "short"))}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="sec"><span class="num">A</span><span class="st">Pilar yang menjadi fokus</span><span class="hint">pilih satu</span></div>
+        <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px">${chips}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="sec"><span class="num">B</span><span class="st">Kondisi saya saat ini</span><span class="hint">kebiasaan dan keadaan sekarang terkait pilar ini</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:12px">
+          <div class="box"><span class="lbl">Yang terjadi sekarang</span>${L("now1")}${L("now2")}${L("now3")}</div>
+          <div class="box"><span class="lbl">Yang sudah berjalan baik</span>${L("ok1")}${L("ok2")}${L("ok3")}</div>
+        </div>
+        <div class="ruler"><span style="width:270px;font-weight:600">Seberapa penting perubahan ini bagi saya?</span>${sc(st.penting)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="sec"><span class="num">C</span><span class="st">Target saya</span><span class="hint">spesifik dan terukur, mis. jalan cepat 30 menit, 5 hari seminggu</span></div>
+        <div class="box" style="border-color:#028090;background:#F4FAF9">${L("tgt1")}${L("tgt2")}</div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+          <div class="box"><span class="lbl">Tanda bahwa target saya tercapai</span>${L("tanda")}</div>
+          <div class="box"><span class="lbl">Mengapa ini penting bagi saya</span>${L("alasan")}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="sec"><span class="num">D</span><span class="st">Langkah-langkah yang akan saya lakukan</span></div>
+        <table class="tb"><colgroup><col style="width:30px"><col><col style="width:210px"></colgroup>
+          <thead><tr><th style="text-align:center;padding:4px 0">No</th><th>Langkah</th><th>Kapan / seberapa sering</th></tr></thead><tbody>${steps}</tbody></table>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+          <div class="box"><span class="lbl">Hambatan yang mungkin muncul</span>${L("hb1")}${L("hb2")}</div>
+          <div class="box"><span class="lbl">Cara saya mengatasinya</span>${L("cr1")}${L("cr2")}</div>
+          <div class="box"><span class="lbl">Orang yang mendukung saya</span>${L("dk1")}${L("dk2")}</div>
+        </div>
+        <div class="ruler"><span style="width:270px;font-weight:600">Seberapa yakin saya bisa menjalankannya?</span>${sc(st.yakin)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="sec"><span class="num">E</span><span class="st">Waktu perubahan dan kontrol kembali</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+          <div class="box" style="border-color:#028090"><span class="lbl">Mulai tanggal</span><span class="ln">${esc(fmtDate(st.mulai))}</span></div>
+          <div class="box" style="border-color:#028090"><span class="lbl">Saya menilai kemajuan setiap</span>${L("evaluasi")}</div>
+          <div class="box" style="border-color:#013A40;background:#EAF5F4"><span class="lbl">Kontrol kembali tanggal</span><span class="ln">${esc(fmtDate(st.kontrol))}</span></div>
+        </div>
+      </div>
+      <div style="border:1.5px dashed #013A40;border-radius:8px;padding:7px 11px;display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;font-size:12.5px">
+          <span class="lbl">Saat kontrol (diisi dokter):</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><span class="cb"></span>Target tercapai</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><span class="cb"></span>Sebagian</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><span class="cb"></span>Belum</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><span class="cb"></span>Lanjut ke target berikutnya</span>
+        </div>
+        <span class="ln"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px;font-size:12.5px;margin-top:auto">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="height:26px;border-bottom:1.2px solid #8FB3AF"></span><span style="color:#4A6563;font-weight:600">Pasien</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="height:26px;border-bottom:1.2px solid #8FB3AF"></span><span class="v" data-v="dokter" style="color:#4A6563;font-weight:600"></span></div>
+      </div>
+    </div>`;
+    $$("#sheet1 [data-v]").forEach((el) => { el.textContent = st[el.dataset.v] || ""; });
+  }
+  function defaults() { return { tanggal: today(), dokter: DOKTER }; }
+  function sample() {
+    return { nama: "Bapak Hendra (contoh)", rm: "45-67-89", pilar: "g", penting: "8", yakin: "7",
+      now1: "Hampir tidak berolahraga; duduk sekitar 9 jam sehari di kantor", now2: "Mudah lelah naik tangga",
+      ok1: "Sudah punya sepatu olahraga", ok2: "Rumah dekat taman kompleks",
+      tgt1: "Jalan cepat 30 menit, 5 hari seminggu, dalam 4 minggu",
+      tanda: "Catatan di Resep Gaya Hidup terisi 5 hari per minggu", alasan: "Ingin gula darah terkendali dan kuat bermain dengan cucu",
+      l1: "Siapkan sepatu dan baju olahraga di dekat pintu", w1: "Malam sebelumnya", l2: "Jalan cepat di taman kompleks", w2: "Senin–Jumat, 05.30",
+      l3: "Berdiri dan berjalan 5 menit setiap 1 jam di kantor", w3: "Setiap jam kerja",
+      hb1: "Hujan pagi hari", cr1: "Jalan di dalam rumah atau naik-turun tangga 15 menit", dk1: "Istri ikut jalan pagi",
+      evaluasi: "Hari Minggu malam" };
+  }
+  KKLP.docTool({ key: "rencana-aksi", defaults, sample, render });
+})();
+</script>
+</body>
+</html>
