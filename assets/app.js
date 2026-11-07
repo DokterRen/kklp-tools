@@ -52,14 +52,14 @@
       }
     });
   }
-  /* Scale the 794×1123 sheets to fit the preview column. */
+  /* Scale the A4 sheets (794×1123 portrait or 1123×794 landscape) to fit the preview column. */
   function scalePages() {
     const pages = $(".pages"); if (!pages) return;
     const avail = pages.clientWidth - 6;
-    const s = Math.min(1, Math.max(0.2, avail / 794));
     $$(".pagebox", pages).forEach((box) => {
-      const sh = box.firstElementChild;
-      box.style.width = Math.floor(794 * s) + "px"; box.style.height = Math.floor(1123 * s) + "px";
+      const sh = box.firstElementChild, w = sh.offsetWidth || 794, h = sh.offsetHeight || 1123;
+      const s = Math.min(1, Math.max(0.2, avail / w));
+      box.style.width = Math.floor(w * s) + "px"; box.style.height = Math.floor(h * s) + "px";
       sh.style.transform = "scale(" + s + ")";
     });
   }
@@ -68,18 +68,20 @@
     toast("Menyiapkan PDF…");
     try { await document.fonts.ready; } catch (e) { /* ignore */ }
     const holder = document.createElement("div");
-    holder.style.cssText = "position:fixed;left:-12000px;top:0;width:794px;";
+    holder.style.cssText = "position:fixed;left:-12000px;top:0;";
     document.body.appendChild(holder);
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const sheets = $$(".pagebox > .sheet");
+    const orient = (el) => (el.offsetWidth > el.offsetHeight ? "landscape" : "portrait");
+    const doc = new jsPDF({ orientation: sheets.length ? orient(sheets[0]) : "portrait", unit: "mm", format: "a4" });
     try {
-      const sheets = $$(".pagebox > .sheet");
       for (let i = 0; i < sheets.length; i++) {
+        const w = sheets[i].offsetWidth || 794, h = sheets[i].offsetHeight || 1123, o = orient(sheets[i]);
         const clone = sheets[i].cloneNode(true); clone.style.transform = "none";
-        holder.innerHTML = ""; holder.appendChild(clone);
-        const canvas = await window.html2canvas(clone, { scale: 2.5, backgroundColor: "#FFFFFF", logging: false, width: 794, height: 1123, windowWidth: 794 });
-        if (i > 0) doc.addPage("a4", "portrait");
-        doc.addImage(canvas.toDataURL("image/jpeg", 0.93), "JPEG", 0, 0, 210, 297);
+        holder.style.width = w + "px"; holder.innerHTML = ""; holder.appendChild(clone);
+        const canvas = await window.html2canvas(clone, { scale: 2.5, backgroundColor: "#FFFFFF", logging: false, width: w, height: h, windowWidth: w });
+        if (i > 0) doc.addPage("a4", o);
+        doc.addImage(canvas.toDataURL("image/jpeg", 0.93), "JPEG", 0, 0, o === "landscape" ? 297 : 210, o === "landscape" ? 210 : 297);
       }
       download(filename, doc.output("blob"));
       toast("PDF diunduh: " + filename);

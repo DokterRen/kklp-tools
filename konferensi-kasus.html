@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Konferensi Kasus Terpadu</title>
+<meta name="description" content="Rencana perawatan terpadu pasien rawat inap yang dikoordinasi Kedokteran Keluarga, dengan ringkasan bahasa sederhana untuk keluarga. Siap cetak A4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/instrumen.css">
+<style>
+.opts.three .opt span, .opts.two .opt span { min-height: 34px; }
+.opts.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.trow { display: grid; gap: 6px; align-items: center; }
+.trow .idx { font-size: 12px; color: var(--muted); text-align: right; }
+.t-ps { grid-template-columns: 18px minmax(0, 1.3fr) minmax(0, 1fr); }
+.t-ms { grid-template-columns: 18px minmax(0, 1fr) 62px 62px; }
+.t-ms2 { grid-template-columns: 18px minmax(0, 1fr); }
+.t-kp { grid-template-columns: 18px minmax(0, 1fr) minmax(0, 1.4fr); }
+.t-ob { grid-template-columns: 18px 70px minmax(0, 1fr) minmax(0, 1fr); }
+.t-tk { grid-template-columns: 18px minmax(0, 1.6fr) minmax(0, 1fr); }
+.t-tk2 { grid-template-columns: 18px minmax(0, 1fr) 100px; }
+.subrow { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-top: 1px dashed var(--line); }
+.subrow:first-of-type { border-top: 0; }
+.subrow[hidden] { display: none; }
+select { padding: 6px 4px; }
+.sublbl { font-size: 13px; font-weight: 700; color: var(--deep); margin: 4px 0 -2px; }
+@media (max-width: 520px) { .t-ob { grid-template-columns: 18px 64px minmax(0, 1fr); } .t-ob > :last-child { grid-column: 2 / -1; } }
+
+/* ---- printed sheets ---- */
+.sheet .pg { width: 794px; height: 1123px; box-sizing: border-box; padding: 36px 42px 32px; display: flex; flex-direction: column; gap: 10px; font-family: 'Source Sans 3', 'Segoe UI', sans-serif; color: #16302E; }
+.sheet .ln { display: flex; align-items: flex-end; height: 23px; border-bottom: 1.2px solid #B9CFCC; white-space: nowrap; overflow: hidden; font-size: 13px; padding: 0 2px 3px; box-sizing: border-box; min-width: 0; font-weight: 600; }
+.sheet .sec { display: flex; align-items: center; gap: 9px; }
+.sheet .num { width: 24px; height: 24px; border-radius: 12px; background: #013A40; color: #FFFFFF; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sheet .st { font-family: 'Source Serif 4', Georgia, serif; font-size: 17px; font-weight: 700; color: #013A40; }
+.sheet .hint { font-size: 12px; color: #4A6563; }
+.sheet .lbl { font-size: 12.5px; font-weight: 700; color: #013A40; }
+.sheet .cb { display: inline-block; width: 13px; height: 13px; border: 1.6px solid #16302E; border-radius: 3px; box-sizing: border-box; flex-shrink: 0; }
+.sheet .op { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.sheet .ops { display: flex; flex-wrap: wrap; gap: 4px 15px; font-size: 12.5px; align-items: center; }
+.sheet .frow .ops { flex-wrap: nowrap; gap: 4px 12px; padding-bottom: 2px; }
+.sheet .box { border: 1.5px solid #9FC9C4; border-radius: 8px; padding: 6px 11px 8px; display: flex; flex-direction: column; }
+.sheet .tb { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12.5px; }
+.sheet .tb th { background: #028090; color: #FFFFFF; text-align: left; padding: 4px 8px; border: 1px solid #028090; font-weight: 700; }
+.sheet .tb td { border: 1px solid #B9CFCC; height: 25px; padding: 0 8px; }
+.sheet .tb td.n { text-align: center; color: #4A6563; font-weight: 700; }
+.sheet .tb td.c { padding: 0; text-align: center; }
+.sheet .cell { height: 24px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; font-size: 12.5px; font-weight: 600; }
+.sheet .codes { display: inline-flex; gap: 5px; justify-content: center; align-items: center; height: 24px; }
+.sheet .codes span { width: 17px; height: 17px; display: inline-flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; color: #4A6563; border-radius: 9px; box-sizing: border-box; }
+.sheet .codes span.sel { border: 1.6px solid #013A40; color: #013A40; }
+.sheet .codes.has span:not(.sel) { opacity: .35; }
+.sheet .done { font-weight: 700; color: #013A40; font-size: 14px; }
+.sheet .idg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 14px; }
+.sheet .idg > div { display: flex; flex-direction: column; min-width: 0; }
+.sheet .idg > div > span:first-child { font-size: 11.5px; font-weight: 600; color: #4A6563; }
+.sheet .idv { height: 18px; border-bottom: 1.2px solid #8FB3AF; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; display: flex; align-items: flex-end; padding: 0 1px 2px; box-sizing: border-box; }
+.sheet .frow { display: flex; align-items: flex-end; gap: 8px; font-size: 12.5px; min-width: 0; }
+.sheet .frow > b { font-weight: 700; color: #013A40; flex-shrink: 0; padding-bottom: 3px; }
+.sheet .fv { flex-grow: 1; min-width: 0; height: 20px; border-bottom: 1.2px solid #B9CFCC; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; display: flex; align-items: flex-end; padding: 0 2px 2px; box-sizing: border-box; }
+.sheet .fv.w { flex-grow: 0; }
+.sheet .u { display: inline-block; min-width: 110px; border-bottom: 1.2px solid #8FB3AF; font-weight: 600; padding: 0 3px; }
+.sheet .sig { display: flex; flex-direction: column; gap: 2px; }
+.sheet .sig > span:first-child { height: 30px; border-bottom: 1.2px solid #8FB3AF; display: flex; align-items: flex-end; font-weight: 600; font-size: 12.5px; padding-bottom: 2px; white-space: nowrap; overflow: hidden; }
+.sheet .sig > span:last-child { color: #4A6563; font-weight: 600; }
+/* family summary */
+.sheet .fam { font-size: 14px; gap: 9px; }
+.sheet .fam .ln { height: 24px; font-size: 14px; }
+.sheet .fam .card { border: 1.5px solid #9FC9C4; border-radius: 10px; padding: 6px 14px 8px; display: flex; flex-direction: column; }
+.sheet .fam .hd { display: flex; align-items: center; gap: 9px; margin-bottom: 1px; }
+.sheet .fam .num { background: #028090; }
+.sheet .fam .hint { font-size: 12.5px; }
+.sheet .fam .li { display: flex; align-items: flex-end; gap: 9px; }
+.sheet .fam .li .ln { flex-grow: 1; }
+.sheet .fam .li .cb { width: 14px; height: 14px; margin-bottom: 5px; }
+.sheet .fam .li .n { font-weight: 700; color: #4A6563; width: 14px; padding-bottom: 4px; font-size: 13px; }
+.sheet .fam .frow { font-size: 14px; }
+.sheet .fam .fv { height: 24px; font-size: 14px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Konferensi Kasus Terpadu</h1><p>Rencana perawatan terpadu pasien rawat inap · A4, 2 halaman + ringkasan keluarga</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btn-new" type="button">Formulir baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Isi data</button><button type="button" data-view="preview">Pratinjau &amp; cetak</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="idhint" id="idhint" hidden></div>
+    <details class="card"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+    <div id="sections"></div>
+    <datalist id="disiplin"><option value="DPJP utama"><option value="Kedokteran Keluarga"><option value="Penyakit Dalam"><option value="Neurologi"><option value="Kardiologi"><option value="Bedah"><option value="Rehabilitasi Medik"><option value="Psikiatri"><option value="Perawat penanggung jawab"><option value="Apoteker klinis"><option value="Dietisien"><option value="Fisioterapis"><option value="Manajer pelayanan pasien"><option value="Pekerja sosial"><option value="Rohaniwan"><option value="Pasien"><option value="Keluarga"></datalist>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Pratinjau A4">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+      <span class="sp"></span>
+      <span class="note">Kolom yang dikosongkan tercetak sebagai garis untuk ditulis tangan.</span>
+    </div>
+    <div class="pages" id="pages"></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, esc, fmtDate, today } = KKLP;
+  const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
+  const N_PS = 6, N_MS = 6, N_KP = 3, N_OB = 4, N_TK = 6;
+  const R = (n) => Array.from({ length: n }, (_, i) => i + 1);
+
+  /* ---------- form ---------- */
+  const txt = (k, label, ph, extra) => `<input type="text" data-k="${k}" aria-label="${esc(label)}"${ph ? ` placeholder="${esc(ph)}"` : ""}${extra || ""}>`;
+  const fld = (k, label, ph, type) => `<div class="field"><label for="f-${k}">${label}</label><input type="${type || "text"}" id="f-${k}" data-k="${k}"${ph ? ` placeholder="${esc(ph)}"` : ""}></div>`;
+  const radios = (k, opts, cls) => `<div class="opts ${cls || ""}" role="radiogroup">${opts.map(([v, t]) => `<label class="opt"><input type="radio" name="${k}" data-k="${k}" value="${v}"><span>${t}</span></label>`).join("")}</div>`;
+  const checks = (items) => `<div class="checks">${items.map(([k, t]) => `<label><input type="checkbox" data-k="${k}"> ${t}</label>`).join("")}</div>`;
+  const sel = (k, label, opts) => `<select data-k="${k}" aria-label="${esc(label)}"><option value=""></option>${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select>`;
+  const card = (id, no, title, inner, open) => `<details class="card" id="sec-${id}"${open ? " open" : ""}><summary>${no ? `<span class="secno">${no}</span> ` : ""}${title}</summary><div class="card-body">${inner}</div></details>`;
+  const JENIS = [["B", "B · biomedis"], ["F", "F · fungsional"], ["P", "P · psikososial"]];
+  const PRIO = [["M", "M · mendesak"], ["A", "A · aktif"], ["K", "K · kronik"]];
+  const UBAH = [["S", "S · stop"], ["B", "B · baru"], ["U", "U · ubah"]];
+
+  $("#sections").innerHTML =
+    card("id", "", "Identitas dan konferensi", `
+      <div class="field"><label for="f-nama">Nama pasien</label><input type="text" id="f-nama" data-k="nama" data-id="1"></div>
+      <div class="grid2"><div class="field"><label for="f-rm">No. RM</label><input type="text" id="f-rm" data-k="rm" data-id="1"></div>
+      ${fld("usia", "Usia / jenis kelamin", "mis. 68 th / L")}</div>
+      <div class="grid2">${fld("ruang", "Ruang / tempat tidur")}${fld("tglMasuk", "Tanggal masuk", "", "date")}</div>
+      <div class="grid2">${fld("tglKonf", "Tanggal konferensi", "", "date")}${fld("dpjp", "DPJP utama")}</div>
+      ${fld("koordinator", "Koordinator perawatan")}`, true) +
+    card("ps", "1", "Peserta konferensi", `
+      <div class="rows" data-rows data-min="3"><div class="trow t-ps rowhead"><span></span><span>Nama</span><span>Disiplin / peran</span></div>
+      ${R(N_PS).map((i) => `<div class="trow t-ps rowin"><span class="idx">${i}</span>${txt("ps" + i, "Nama peserta " + i)}${txt("pd" + i, "Disiplin peserta " + i, i === 1 ? "pilih atau ketik" : "", ' list="disiplin"')}</div>`).join("")}</div>
+      <p class="note">Paraf ditulis tangan di lembar cetak.</p>`, true) +
+    card("rk", "2", "Ringkasan kasus", `
+      <div class="field"><span class="lbl-ui">Alasan rawat dan diagnosis kerja</span><div class="rows">${txt("diag1", "Diagnosis baris 1")}${txt("diag2", "Diagnosis baris 2")}</div></div>
+      <div class="field"><span class="lbl-ui">Perjalanan selama dirawat</span><div class="rows">${txt("jalan1", "Perjalanan baris 1")}${txt("jalan2", "Perjalanan baris 2")}</div></div>
+      ${fld("alasanKonf", "Pertanyaan / alasan konferensi ini", "mis. menyepakati tujuan perawatan dan rencana pulang")}`) +
+    card("ms", "3", "Daftar masalah terpadu", `
+      <p class="note">Satu daftar untuk semua disiplin. Jenis: B biomedis, F fungsional, P psikososial. Prioritas: M mendesak (selesaikan selama rawat), A aktif, K kronik (lanjut di FKTP).</p>
+      <div class="rows" data-rows data-min="3">
+      ${R(N_MS).map((i) => `<div class="subrow rowin"><div class="trow t-ms"><span class="idx">${i}</span>${txt("m" + i, "Masalah " + i, i === 1 ? "masalah" : "")}${sel("mj" + i, "Jenis masalah " + i, JENIS)}${sel("mp" + i, "Prioritas masalah " + i, PRIO)}</div>
+        <div class="trow t-ms2"><span></span>${txt("mpj" + i, "Penanggung jawab masalah " + i, i === 1 ? "penanggung jawab" : "")}</div></div>`).join("")}</div>`) +
+    card("tj", "4", "Tujuan perawatan", `
+      ${fld("penting", "Yang paling penting bagi pasien (kata-katanya sendiri)", "mis. ingin pulang dan bisa ke kamar mandi sendiri")}
+      <div class="field"><span class="lbl-ui">Tingkat perawatan</span>${radios("tingkat", [["penuh", "Penuh (termasuk ICU)"], ["terbatas", "Terbatas"], ["paliatif", "Kenyamanan / paliatif"]], "three")}</div>
+      ${fld("terbatasKet", "Bila terbatas: batasannya", "mis. tanpa intubasi")}
+      <div class="field"><span class="lbl-ui">Resusitasi jantung paru (RJP)</span>${radios("rjp", [["ya", "Dilakukan"], ["dnr", "Tidak dilakukan (DNR)"], ["belum", "Belum dibahas"]], "three")}</div>
+      <div class="field"><span class="lbl-ui">Pengambil keputusan</span>${radios("putus", [["pasien", "Pasien sendiri"], ["wakil", "Wakil"]], "two")}</div>
+      <div class="grid2">${fld("wakil", "Nama wakil")}${fld("hubWakil", "Hubungan dengan pasien")}</div>`) +
+    card("kp", "5", "Keputusan dan perbedaan yang diselesaikan", `
+      <p class="note">Catat juga tindakan yang disepakati <b>tidak</b> dilakukan.</p>
+      <div class="rows"><div class="trow t-kp rowhead"><span></span><span>Isu yang dibahas</span><span>Keputusan tim</span></div>
+      ${R(N_KP).map((i) => `<div class="trow t-kp"><span class="idx">${i}</span>${txt("is" + i, "Isu " + i)}${txt("kp" + i, "Keputusan " + i)}</div>`).join("")}</div>`) +
+    card("ob", "6", "Rencana obat", `
+      <div class="field"><span class="lbl-ui">Rekonsiliasi obat</span>${radios("rekon", [["sudah", "Sudah (lembar terlampir)"], ["belum", "Belum"]], "two")}</div>
+      <div class="grid2">${fld("obSebelum", "Jumlah obat sebelum masuk", "", "number")}${fld("obPulang", "Jumlah obat saat pulang", "", "number")}</div>
+      <div class="rows"><div class="trow t-ob rowhead"><span></span><span>Perubahan</span><span>Obat dan dosis</span><span>Alasan</span></div>
+      ${R(N_OB).map((i) => `<div class="trow t-ob"><span class="idx">${i}</span>${sel("oc" + i, "Jenis perubahan obat " + i, UBAH)}${txt("on" + i, "Obat " + i)}${txt("oa" + i, "Alasan perubahan obat " + i)}</div>`).join("")}</div>
+      <p class="note">Daftar obat lengkap: <a href="rekonsiliasi-obat.html">Rekonsiliasi Obat</a>.</p>`) +
+    card("kl", "7", "Keluarga dan psikososial", `
+      <div class="grid2">${fld("pkKel", "Pengambil keputusan di keluarga")}${fld("pelaku", "Pelaku rawat utama di rumah")}</div>
+      <div class="field"><span class="lbl-ui">Pemahaman keluarga tentang kondisi</span>${radios("paham", [["baik", "Baik"], ["sebagian", "Sebagian"], ["kurang", "Kurang / berbeda dengan tim"]], "three")}</div>
+      <div class="field"><span class="lbl-ui">Pembiayaan</span>${checks([["by_bpjs", "BPJS Kesehatan"], ["by_asuransi", "Asuransi lain"], ["by_mandiri", "Mandiri"], ["by_kendala", "Ada kendala biaya"]])}</div>
+      <div class="field"><span class="lbl-ui">Kesiapan merawat di rumah</span>${radios("siap", [["siap", "Siap"], ["latih", "Perlu pelatihan"], ["belum", "Belum siap / perlu rujuk sosial"]], "three")}</div>
+      <p class="note">Bisa dinilai dengan <a href="kesiapan-merawat.html">Kesiapan Merawat</a>.</p>
+      ${fld("sosial", "Kebutuhan sosial / spiritual")}
+      <div class="grid2">${fld("sampaiOleh", "Hasil disampaikan ke keluarga oleh")}${fld("sampaiTgl", "Tanggal", "", "date")}</div>`) +
+    card("pl", "8", "Rencana pulang", `
+      <div class="field"><span class="lbl-ui">Kriteria pulang</span><div class="rows">${txt("kriteria1", "Kriteria pulang baris 1", "mis. bebas demam 48 jam, bisa minum obat oral")}${txt("kriteria2", "Kriteria pulang baris 2")}</div></div>
+      ${fld("tglPulang", "Perkiraan tanggal pulang", "", "date")}
+      <div class="field"><span class="lbl-ui">Pulang ke</span>${radios("pulangKe", [["rumah", "Rumah sendiri"], ["keluarga", "Rumah keluarga"], ["fasilitas", "Fasilitas lain"]], "three")}</div>
+      <div class="field"><span class="lbl-ui">Kebutuhan di rumah</span>${checks([["n_edu", "Edukasi pelaku rawat"], ["n_alat", "Alat bantu jalan / kursi roda"], ["n_o2", "Oksigen"], ["n_luka", "Perawatan luka / NGT / kateter"], ["n_kunj", "Kunjungan rumah"], ["n_fisio", "Fisioterapi lanjutan"], ["n_diet", "Diet khusus"]])}</div>
+      ${fld("nLain", "Kebutuhan lain")}
+      <div class="grid2">${fld("poli", "Kontrol poli")}${fld("rujukBalik", "Rujuk balik ke FKTP")}</div>
+      ${fld("kontakTgl", "Kontak pertama setelah pulang (≤ 7 hari)", "", "date")}
+      <div class="field"><span class="lbl-ui">Melalui</span>${radios("kontakVia", [["telp", "Telepon"], ["kunjungan", "Kunjungan"], ["kontrol", "Kontrol"]], "three")}</div>`) +
+    card("tk", "9", "Daftar tindakan dan evaluasi", `
+      <div class="rows" data-rows data-min="3">
+      ${R(N_TK).map((i) => `<div class="subrow rowin"><div class="trow t-tk"><span class="idx">${i}</span>${txt("t" + i, "Tindakan " + i, i === 1 ? "tindakan" : "")}${txt("tp" + i, "Penanggung jawab tindakan " + i, i === 1 ? "penanggung jawab" : "")}</div>
+        <div class="trow t-tk2"><span></span>${txt("tb" + i, "Batas waktu tindakan " + i, i === 1 ? "batas waktu, mis. Kamis 12/11" : "")}${sel("tc" + i, "Status tindakan " + i, [["ok", "✓ Selesai"]])}</div></div>`).join("")}</div>
+      <div class="grid2">${fld("evalTgl", "Evaluasi ulang tanggal", "", "date")}${fld("evalBila", "Evaluasi lebih awal bila", "mis. sepsis berulang, keluarga menolak rencana")}</div>`) +
+    card("kf", "", "Ringkasan untuk keluarga", `
+      <div class="checks"><label><input type="checkbox" data-k="cetakKel"> Cetak ringkasan untuk keluarga (halaman 3)</label></div>
+      <p class="note">Tulis dengan bahasa sehari-hari. Nama, ruang, tanggal, hal yang penting bagi pasien, tanggal pulang, poli, dan koordinator diambil dari isian di atas.</p>
+      <div class="field"><span class="lbl-ui">Kondisi saat ini</span><div class="rows">${txt("kf_k1", "Kondisi baris 1", "mis. infeksi paru sudah membaik, tetapi masih lemah")}${txt("kf_k2", "Kondisi baris 2")}${txt("kf_k3", "Kondisi baris 3")}</div></div>
+      <div class="field"><span class="lbl-ui">Rencana tim selama di rumah sakit</span><div class="rows">${txt("kf_r1", "Rencana 1")}${txt("kf_r2", "Rencana 2")}${txt("kf_r3", "Rencana 3")}</div></div>
+      <div class="field"><span class="lbl-ui">Yang perlu disiapkan keluarga</span><div class="rows">${txt("kf_s1", "Persiapan 1")}${txt("kf_s2", "Persiapan 2")}${txt("kf_s3", "Persiapan 3")}</div></div>
+      <div class="grid2">${fld("kf_kontrol", "Kontrol pertama (tanggal)", "", "date")}${fld("kf_bawa", "Obat dan alat yang dibawa")}</div>
+      <div class="field"><span class="lbl-ui">Segera hubungi kami atau ke IGD bila</span><div class="rows">${txt("kf_b1", "Tanda bahaya 1", "mis. sesak, demam > 38 °C, tidak mau makan")}${txt("kf_b2", "Tanda bahaya 2")}</div></div>
+      <div class="grid2">${fld("kf_telp", "Telp / WA koordinator")}${fld("kf_prw", "Perawat penanggung jawab")}</div>
+      ${fld("kf_prwTelp", "Telp perawat / ruangan")}`);
+
+  /* ---------- sheets ---------- */
+  const V = (k, cls, fit) => `<span class="${cls} v" data-v="${k}" data-src="${k}" data-fit="${fit || 8.5}"></span>`;
+  const L = (k) => `<span class="ln v" data-v="${k}" data-src="${k}" data-fit="8.5" data-wrap="11"></span>`;
+  const cell = (k) => `<div class="cell v" data-v="${k}" data-src="${k}" data-fit="8.5"></div>`;
+  const cb = (on, t) => `<span class="op"><span class="cb${on ? " on" : ""}"></span>${t}</span>`;
+  const codes = (letters, v) => `<span class="codes${v ? " has" : ""}">${letters.split("").map((c) => `<span class="${v === c ? "sel" : ""}">${c}</span>`).join("")}</span>`;
+  const head = (n) => `<div style="font-size:12px;font-weight:700;color:#013A40;border:1.5px solid #013A40;border-radius:6px;padding:3px 9px;flex-shrink:0">Hlm ${n} / 2</div>`;
+
+  function page1(st) {
+    const half = (from) => `<table class="tb"><colgroup><col><col style="width:128px"><col style="width:46px"></colgroup>
+      <thead><tr><th>Nama</th><th>Disiplin / peran</th><th style="text-align:center;padding:4px 0">Paraf</th></tr></thead><tbody>
+      ${[from, from + 1, from + 2].map((i) => `<tr><td>${cell("ps" + i)}</td><td>${cell("pd" + i)}</td><td></td></tr>`).join("")}</tbody></table>`;
+    const ms = R(N_MS).map((i) => `<tr><td class="n">${i}</td><td>${cell("m" + i)}</td><td class="c">${codes("BFP", st["mj" + i])}</td><td class="c">${codes("MAK", st["mp" + i])}</td><td>${cell("mpj" + i)}</td></tr>`).join("");
+    const kp = R(N_KP).map((i) => `<tr><td class="n">${i}</td><td>${cell("is" + i)}</td><td>${cell("kp" + i)}</td></tr>`).join("");
+    return `<div class="pg">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;border-bottom:3px solid #013A40;padding-bottom:8px">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="font-size:11.5px;font-weight:700;letter-spacing:.14em;color:#028090">KEDOKTERAN KELUARGA LAYANAN PRIMER</div>
+          <div style="font-family:'Source Serif 4',Georgia,serif;font-size:29px;font-weight:700;line-height:1.05;color:#013A40">Konferensi Kasus Terpadu</div>
+          <div style="font-size:13px;color:#4A6563">Rencana perawatan terpadu pasien rawat inap · dikoordinasi oleh Kedokteran Keluarga</div>
+        </div>${head(1)}
+      </div>
+      <div class="idg">
+        <div><span>Nama pasien</span>${V("nama", "idv")}</div>
+        <div><span>No. RM</span>${V("rm", "idv")}</div>
+        <div><span>Usia / jenis kelamin</span>${V("usia", "idv")}</div>
+        <div><span>Ruang / tempat tidur</span>${V("ruang", "idv")}</div>
+        <div><span>Tanggal masuk</span><span class="idv">${esc(fmtDate(st.tglMasuk, "short"))}</span></div>
+        <div><span>Tanggal konferensi</span><span class="idv">${esc(fmtDate(st.tglKonf, "short"))}</span></div>
+        <div><span>DPJP utama</span>${V("dpjp", "idv")}</div>
+        <div><span>Koordinator perawatan</span>${V("koordinator", "idv", 8)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">1</span><span class="st">Peserta konferensi</span><span class="hint">termasuk pasien / keluarga bila hadir</span></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">${half(1)}${half(4)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">2</span><span class="st">Ringkasan kasus</span></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+          <div class="box"><span class="lbl">Alasan rawat dan diagnosis kerja</span>${L("diag1")}${L("diag2")}</div>
+          <div class="box"><span class="lbl">Perjalanan selama dirawat</span>${L("jalan1")}${L("jalan2")}</div>
+        </div>
+        <div class="box" style="flex-direction:row;align-items:flex-end;gap:10px;padding-top:4px"><span class="lbl" style="flex-shrink:0;padding-bottom:3px">Pertanyaan / alasan konferensi ini</span><span class="ln v" style="flex-grow:1" data-v="alasanKonf" data-src="alasanKonf" data-fit="8.5"></span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">3</span><span class="st">Daftar masalah terpadu</span><span class="hint">satu daftar untuk semua disiplin</span></div>
+        <table class="tb"><colgroup><col style="width:30px"><col><col style="width:78px"><col style="width:78px"><col style="width:150px"></colgroup>
+          <thead><tr><th style="text-align:center;padding:4px 0">No</th><th>Masalah</th><th style="text-align:center">Jenis</th><th style="text-align:center">Prioritas</th><th>Penanggung jawab</th></tr></thead><tbody>${ms}</tbody></table>
+        <div style="font-size:11.5px;color:#4A6563">Lingkari. Jenis: <b>B</b> biomedis · <b>F</b> fungsional · <b>P</b> psikososial. Prioritas: <b>M</b> mendesak (selama rawat) · <b>A</b> aktif · <b>K</b> kronik (lanjut di FKTP)</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">4</span><span class="st">Tujuan perawatan</span></div>
+        <div class="box" style="gap:5px">
+          <span class="lbl">Yang paling penting bagi pasien (dengan kata-katanya sendiri)</span>
+          <span class="ln v" style="margin-top:-4px" data-v="penting" data-src="penting" data-fit="8.5" data-wrap="11"></span>
+          <div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:7px 10px;font-size:12.5px;align-items:center;margin-top:4px">
+            <span class="lbl">Tingkat perawatan</span>
+            <div class="ops">${cb(st.tingkat === "penuh", "Penuh (termasuk ICU)")}${cb(st.tingkat === "terbatas", "Terbatas:")}<span class="u" data-v="terbatasKet" style="min-width:150px;max-width:220px;overflow:hidden;white-space:nowrap;margin-left:-10px"></span>${cb(st.tingkat === "paliatif", "Kenyamanan / paliatif")}</div>
+            <span class="lbl">Resusitasi (RJP)</span>
+            <div class="ops">${cb(st.rjp === "ya", "Dilakukan")}${cb(st.rjp === "dnr", "Tidak dilakukan (DNR)")}${cb(st.rjp === "belum", "Belum dibahas")}</div>
+            <span class="lbl">Pengambil keputusan</span>
+            <div class="ops">${cb(st.putus === "pasien", "Pasien sendiri")}${cb(st.putus === "wakil", "Wakil:")}<span class="u" data-v="wakil" style="min-width:160px;max-width:190px;overflow:hidden;white-space:nowrap;margin-left:-10px"></span><span>hubungan:</span><span class="u" data-v="hubWakil" style="min-width:90px;max-width:110px;overflow:hidden;white-space:nowrap;margin-left:-10px"></span></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">5</span><span class="st">Keputusan dan perbedaan yang diselesaikan</span></div>
+        <table class="tb"><colgroup><col style="width:30px"><col style="width:250px"><col></colgroup>
+          <thead><tr><th style="text-align:center;padding:4px 0">No</th><th>Isu yang dibahas</th><th>Keputusan tim (termasuk yang disepakati <u>tidak</u> dilakukan)</th></tr></thead><tbody>${kp}</tbody></table>
+      </div>
+      <div style="margin-top:auto;font-size:11.5px;color:#4A6563;text-align:right">Rencana obat, keluarga, rencana pulang dan daftar tindakan: lanjut ke halaman 2 →</div>
+    </div>`;
+  }
+
+  function page2(st) {
+    const ob = R(N_OB).map((i) => `<tr><td class="n">${i}</td><td class="c">${codes("SBU", st["oc" + i])}</td><td>${cell("on" + i)}</td><td>${cell("oa" + i)}</td></tr>`).join("");
+    const tk = R(N_TK).map((i) => `<tr><td class="n">${i}</td><td>${cell("t" + i)}</td><td>${cell("tp" + i)}</td><td>${cell("tb" + i)}</td><td class="c">${st["tc" + i] ? '<span class="done">✓</span>' : ""}</td></tr>`).join("");
+    const num = (v) => (v === undefined || v === null || v === "" ? "___" : `<b style="border-bottom:1.2px solid #8FB3AF;padding:0 5px">${esc(v)}</b>`);
+    return `<div class="pg">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;border-bottom:3px solid #013A40;padding-bottom:7px">
+        <div style="display:flex;flex-direction:column;gap:1px">
+          <div style="font-size:11.5px;font-weight:700;letter-spacing:.14em;color:#028090">KONFERENSI KASUS TERPADU</div>
+          <div style="font-family:'Source Serif 4',Georgia,serif;font-size:22px;font-weight:700;line-height:1.1;color:#013A40">Rencana tindak lanjut</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:14px;flex-shrink:0">
+          <div style="display:grid;grid-template-columns:50px 150px;gap:2px 8px;font-size:12px;align-items:end">
+            <span style="color:#4A6563;font-weight:600">Nama</span>${V("nama", "idv")}
+            <span style="color:#4A6563;font-weight:600">No. RM</span>${V("rm", "idv")}
+          </div>${head(2)}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">6</span><span class="st">Rencana obat</span></div>
+        <div class="ops"><span class="lbl">Rekonsiliasi obat:</span>${cb(st.rekon === "sudah", "Sudah (lembar terlampir)")}${cb(st.rekon === "belum", "Belum")}<span style="margin-left:auto">Jumlah obat: sebelum masuk ${num(st.obSebelum)} → saat pulang ${num(st.obPulang)}</span></div>
+        <table class="tb"><colgroup><col style="width:30px"><col style="width:92px"><col style="width:220px"><col></colgroup>
+          <thead><tr><th style="text-align:center;padding:4px 0">No</th><th style="text-align:center">Perubahan</th><th>Obat dan dosis</th><th>Alasan</th></tr></thead><tbody>${ob}</tbody></table>
+        <div style="font-size:11.5px;color:#4A6563">Lingkari: <b>S</b> dihentikan · <b>B</b> obat baru · <b>U</b> dosis atau frekuensi diubah</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">7</span><span class="st">Keluarga dan psikososial</span></div>
+        <div class="box" style="gap:6px">
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 20px">
+            <div class="frow"><b>Pengambil keputusan di keluarga</b>${V("pkKel", "fv")}</div>
+            <div class="frow"><b>Pelaku rawat utama di rumah</b>${V("pelaku", "fv")}</div>
+          </div>
+          <div class="ops"><span class="lbl" style="width:205px">Pemahaman keluarga</span>${cb(st.paham === "baik", "Baik")}${cb(st.paham === "sebagian", "Sebagian")}${cb(st.paham === "kurang", "Kurang / berbeda dengan tim")}</div>
+          <div class="ops"><span class="lbl" style="width:205px">Pembiayaan</span>${cb(st.by_bpjs, "BPJS Kesehatan")}${cb(st.by_asuransi, "Asuransi lain")}${cb(st.by_mandiri, "Mandiri")}${cb(st.by_kendala, "Ada kendala biaya")}</div>
+          <div class="ops"><span class="lbl" style="width:205px">Kesiapan merawat di rumah</span>${cb(st.siap === "siap", "Siap")}${cb(st.siap === "latih", "Perlu pelatihan")}${cb(st.siap === "belum", "Belum siap / perlu rujuk sosial")}</div>
+          <div class="frow"><b>Kebutuhan sosial / spiritual</b>${V("sosial", "fv")}</div>
+          <div class="frow"><b>Hasil konferensi disampaikan ke keluarga oleh</b>${V("sampaiOleh", "fv")}<b>tanggal</b><span class="fv w" style="width:110px">${esc(fmtDate(st.sampaiTgl, "short"))}</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">8</span><span class="st">Rencana pulang</span></div>
+        <div class="box" style="gap:6px">
+          <div class="frow"><b>Kriteria pulang</b>${V("kriteria1", "fv")}</div>
+          <span class="ln v" style="height:20px" data-v="kriteria2" data-src="kriteria2" data-fit="8.5"></span>
+          <div class="frow"><b>Perkiraan tanggal pulang</b><span class="fv w" style="width:150px">${esc(fmtDate(st.tglPulang, "short"))}</span><b style="margin-left:16px">Pulang ke</b><span class="ops">${cb(st.pulangKe === "rumah", "Rumah sendiri")}${cb(st.pulangKe === "keluarga", "Rumah keluarga")}${cb(st.pulangKe === "fasilitas", "Fasilitas lain")}</span></div>
+          <div class="ops" style="margin-top:3px"><span class="lbl" style="width:100%">Kebutuhan di rumah</span>
+            ${cb(st.n_edu, "Edukasi pelaku rawat")}${cb(st.n_alat, "Alat bantu jalan / kursi roda")}${cb(st.n_o2, "Oksigen")}${cb(st.n_luka, "Perawatan luka / NGT / kateter")}${cb(st.n_kunj, "Kunjungan rumah")}${cb(st.n_fisio, "Fisioterapi lanjutan")}${cb(st.n_diet, "Diet khusus")}${cb(!!(st.nLain || "").trim(), "Lainnya:")}<span class="u" data-v="nLain" style="max-width:200px;overflow:hidden;white-space:nowrap;margin-left:-10px"></span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 20px;margin-top:3px">
+            <div class="frow"><b>Kontrol poli</b>${V("poli", "fv")}</div>
+            <div class="frow"><b>Rujuk balik ke FKTP</b>${V("rujukBalik", "fv")}</div>
+          </div>
+          <div class="frow"><b>Kontak pertama setelah pulang (≤ 7 hari)</b><span class="fv w" style="width:110px">${esc(fmtDate(st.kontakTgl, "short"))}</span><b>melalui</b><span class="ops">${cb(st.kontakVia === "telp", "Telepon")}${cb(st.kontakVia === "kunjungan", "Kunjungan")}${cb(st.kontakVia === "kontrol", "Kontrol")}</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sec"><span class="num">9</span><span class="st">Daftar tindakan</span><span class="hint">siapa melakukan apa, kapan</span></div>
+        <table class="tb"><colgroup><col style="width:30px"><col><col style="width:150px"><col style="width:100px"><col style="width:40px"></colgroup>
+          <thead><tr><th style="text-align:center;padding:4px 0">No</th><th>Tindakan</th><th>Penanggung jawab</th><th>Batas waktu</th><th style="text-align:center;padding:4px 0">✓</th></tr></thead><tbody>${tk}</tbody></table>
+      </div>
+      <div style="border:1.5px dashed #013A40;border-radius:8px;padding:7px 11px;display:flex;flex-direction:column;gap:5px;background:#F4FAF9">
+        <div class="frow"><b>Evaluasi ulang tanggal</b><span class="fv w" style="width:130px">${esc(fmtDate(st.evalTgl, "short"))}</span><b style="margin-left:10px">Evaluasi lebih awal bila</b>${V("evalBila", "fv")}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;font-size:12px;margin-top:auto">
+        <div class="sig"><span class="v" data-v="koordinator"></span><span>Koordinator (Kedokteran Keluarga)</span></div>
+        <div class="sig"><span class="v" data-v="dpjp"></span><span>DPJP utama</span></div>
+        <div class="sig"><span></span><span>Pasien / keluarga (telah dijelaskan)</span></div>
+      </div>
+    </div>`;
+  }
+
+  function page3(st) {
+    const fl = (k) => `<span class="ln v" data-v="${k}" data-src="${k}" data-fit="9" data-wrap="11.5"></span>`;
+    return `<div class="pg fam" style="padding:38px 46px 32px">
+      <div style="display:flex;flex-direction:column;gap:3px;border-bottom:3px solid #013A40;padding-bottom:9px">
+        <div style="font-size:11.5px;font-weight:700;letter-spacing:.14em;color:#028090">KEDOKTERAN KELUARGA LAYANAN PRIMER</div>
+        <div style="font-family:'Source Serif 4',Georgia,serif;font-size:28px;font-weight:700;line-height:1.1;color:#013A40">Ringkasan Rencana Perawatan untuk Keluarga</div>
+        <div style="font-size:14px;color:#4A6563">Hasil pertemuan tim dokter dan tenaga kesehatan yang merawat keluarga Bapak/Ibu</div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:6px 18px">
+        <div class="frow"><b>Nama pasien</b>${V("nama", "fv", 9)}</div>
+        <div class="frow"><b>Ruang</b>${V("ruang", "fv", 9)}</div>
+        <div class="frow"><b>Tanggal</b><span class="fv">${esc(fmtDate(st.tglKonf, "short"))}</span></div>
+      </div>
+      <div class="card"><div class="hd"><span class="num">1</span><span class="st">Kondisi saat ini</span><span class="hint">dalam bahasa sehari-hari</span></div>${fl("kf_k1")}${fl("kf_k2")}${fl("kf_k3")}</div>
+      <div class="card" style="background:#F4FAF9;border-color:#028090"><div class="hd"><span class="num">2</span><span class="st">Yang paling penting bagi pasien</span></div>
+        ${fl("penting")}<span class="ln"></span></div>
+      <div class="card"><div class="hd"><span class="num">3</span><span class="st">Rencana tim selama di rumah sakit</span></div>${[1, 2, 3].map((i) => `<div class="li"><span class="n">${i}</span>${fl("kf_r" + i)}</div>`).join("")}</div>
+      <div class="card"><div class="hd"><span class="num">4</span><span class="st">Yang perlu disiapkan keluarga</span><span class="hint">beri tanda bila sudah</span></div>${[1, 2, 3].map((i) => `<div class="li"><span class="cb"></span>${fl("kf_s" + i)}</div>`).join("")}</div>
+      <div class="card"><div class="hd"><span class="num">5</span><span class="st">Rencana pulang dan kontrol</span></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 20px">
+          <div class="frow"><b>Perkiraan tanggal pulang</b><span class="fv">${esc(fmtDate(st.tglPulang, "short"))}</span></div>
+          <div class="frow"><b>Kontrol pertama</b><span class="fv">${esc(fmtDate(st.kf_kontrol, "short"))}</span></div>
+          <div class="frow" style="grid-column:1 / -1"><b>Kontrol di</b>${V("poli", "fv", 9)}</div>
+          <div class="frow" style="grid-column:1 / -1"><b>Obat dan alat yang dibawa</b>${V("kf_bawa", "fv", 9)}</div>
+        </div></div>
+      <div class="card" style="border-color:#C0272D;background:#FDF4F4"><div class="hd"><span class="num" style="background:#C0272D">!</span><span class="st" style="color:#8E1C21">Segera hubungi kami atau ke IGD bila</span></div>
+        <span class="ln v" style="border-color:#E3B3B5" data-v="kf_b1" data-src="kf_b1" data-fit="9" data-wrap="11.5"></span><span class="ln v" style="border-color:#E3B3B5" data-v="kf_b2" data-src="kf_b2" data-fit="9" data-wrap="11.5"></span></div>
+      <div class="card"><div class="hd"><span class="num">6</span><span class="st">Pertanyaan keluarga untuk pertemuan berikutnya</span></div><span class="ln"></span><span class="ln"></span></div>
+      <div style="border:1.5px solid #013A40;border-radius:10px;padding:9px 14px;display:flex;flex-direction:column;gap:4px;background:#EAF5F4">
+        <div class="frow"><b>Koordinator perawatan</b>${V("koordinator", "fv", 9)}<b>Telp / WA</b>${V("kf_telp", "fv w", 9).replace('class="fv w v"', 'class="fv w v" style="width:170px"')}</div>
+        <div class="frow"><b>Perawat penanggung jawab ruangan</b>${V("kf_prw", "fv", 9)}<b>Telp</b>${V("kf_prwTelp", "fv w", 9).replace('class="fv w v"', 'class="fv w v" style="width:170px"')}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px;font-size:13px;margin-top:auto">
+        <div class="sig"><span></span><span>Disampaikan oleh (nama dan paraf)</span></div>
+        <div class="sig"><span></span><span>Diterima oleh keluarga (nama dan hubungan)</span></div>
+      </div>
+    </div>`;
+  }
+
+  function render(st) {
+    const pages = [page1(st), page2(st)];
+    if (st.cetakKel) pages.push(page3(st));
+    $("#pages").innerHTML = pages.map((p) => `<div class="pagebox"><div class="sheet">${p}</div></div>`).join("");
+    $$("#pages [data-v]").forEach((el) => { el.textContent = st[el.dataset.v] || ""; });
+    KKLP.scalePages();
+  }
+  function defaults() { return { tglKonf: today(), koordinator: DOKTER, cetakKel: true }; }
+  function sample() {
+    return {
+      nama: "Ibu Sumiati (contoh)", rm: "12-34-56", usia: "72 th / P", ruang: "Melati 3 / bed 2", tglMasuk: "2026-11-02", tglKonf: today(), dpjp: "dr. A, Sp.PD",
+      ps1: "dr. A", pd1: "DPJP (Penyakit Dalam)", ps2: "dr. Caren", pd2: "Kedokteran Keluarga", ps3: "dr. B", pd3: "Neurologi",
+      ps4: "Ns. C", pd4: "Perawat penanggung jawab", ps5: "apt. D", pd5: "Apoteker klinis", ps6: "Bpk. Joko", pd6: "Keluarga (anak)",
+      diag1: "Pneumonia komunitas pada pasien pasca-stroke iskemik 6 bulan", diag2: "DM tipe 2, hipertensi, disfagia",
+      jalan1: "Demam turun hari ke-3 antibiotik; masih batuk lemah", jalan2: "Tersedak saat minum; gula darah 180–300 mg/dL",
+      alasanKonf: "Menyepakati tujuan perawatan, cara makan yang aman, dan rencana pulang",
+      m1: "Pneumonia aspirasi, perbaikan", mj1: "B", mp1: "M", mpj1: "DPJP utama",
+      m2: "Disfagia, risiko aspirasi berulang", mj2: "F", mp2: "M", mpj2: "Rehab medik / dietisien",
+      m3: "Gula darah tidak terkendali", mj3: "B", mp3: "A", mpj3: "DPJP utama",
+      m4: "Ketergantungan berat (Barthel 6/20)", mj4: "F", mp4: "K", mpj4: "Kedokteran Keluarga",
+      m5: "Pelaku rawat kelelahan, belum terlatih", mj5: "P", mp5: "A", mpj5: "Kedokteran Keluarga",
+      m6: "Polifarmasi (11 obat)", mj6: "B", mp6: "A", mpj6: "Apoteker klinis",
+      penting: "Ingin pulang ke rumah anaknya dan tidak dipasang selang di tenggorokan",
+      tingkat: "terbatas", terbatasKet: "tanpa intubasi", rjp: "dnr", putus: "wakil", wakil: "Bpk. Joko", hubWakil: "anak",
+      is1: "NGT vs makan per oral", kp1: "Makanan cair kental + latihan menelan; NGT bila asupan < 50% selama 3 hari",
+      is2: "Intubasi bila gagal napas", kp2: "Disepakati tidak dilakukan; oksigen dan obat sesak tetap diberikan",
+      is3: "Target gula darah", kp3: "140–200 mg/dL, hindari hipoglikemia; insulin basal saja",
+      rekon: "sudah", obSebelum: "11", obPulang: "7",
+      oc1: "S", on1: "Glibenklamid 5 mg 1x1", oa1: "Risiko hipoglikemia pada lansia",
+      oc2: "B", on2: "Insulin glargin 10 unit malam", oa2: "Gula darah tidak terkendali",
+      oc3: "S", on3: "Ranitidin, vitamin B kompleks", oa3: "Tanpa indikasi jelas",
+      oc4: "U", on4: "Amlodipin 10 → 5 mg", oa4: "Tekanan darah 100/60 saat duduk",
+      pkKel: "Bpk. Joko (anak sulung)", pelaku: "Ibu Rina (menantu)", paham: "sebagian", by_bpjs: true, siap: "latih",
+      sosial: "Ingin didoakan pendeta jemaat; menantu bekerja paruh waktu", sampaiOleh: "dr. Caren", sampaiTgl: today(),
+      kriteria1: "Bebas demam 48 jam, saturasi ≥ 94% udara ruang, bisa minum obat oral", kriteria2: "Pelaku rawat sudah dilatih cara memberi makan aman",
+      tglPulang: "2026-11-12", pulangKe: "keluarga", n_edu: true, n_alat: true, n_kunj: true, n_fisio: true, n_diet: true,
+      poli: "Poli Penyakit Dalam, 2 minggu", rujukBalik: "Puskesmas Medan Baru (PRB DM-HT)", kontakTgl: "2026-11-15", kontakVia: "kunjungan",
+      t1: "Evaluasi menelan dan latihan menelan", tp1: "Rehab medik", tb1: "Senin 9/11",
+      t2: "Latih menantu: posisi makan, tekstur, tanda tersedak", tp2: "Perawat + dietisien", tb2: "Selasa 10/11",
+      t3: "Rekonsiliasi obat pulang dan edukasi", tp3: "Apoteker klinis", tb3: "Rabu 11/11",
+      t4: "Surat rujuk balik dan jadwal kunjungan rumah", tp4: "Kedokteran Keluarga", tb4: "Rabu 11/11", tc4: "",
+      t5: "Konsul kursi roda dan pispot", tp5: "MPP", tb5: "Selasa 10/11", tc5: "ok",
+      evalTgl: "2026-11-11", evalBila: "Demam lagi atau asupan < 50%",
+      kf_k1: "Infeksi paru Ibu sudah membaik, demam sudah turun.", kf_k2: "Ibu masih sering tersedak saat minum, ini bisa membuat paru infeksi lagi.",
+      kf_k3: "Gula darah masih tinggi; obat gula diganti dengan suntikan insulin sekali sehari.",
+      kf_r1: "Latihan menelan setiap hari dengan tim rehabilitasi", kf_r2: "Mengatur obat: dari 11 menjadi 7 macam", kf_r3: "Melatih keluarga cara memberi makan yang aman",
+      kf_s1: "Kursi roda dan pispot di rumah Bpk. Joko", kf_s2: "Menantu ikut latihan memberi makan (Selasa pukul 10.00)", kf_s3: "Alat cek gula darah",
+      kf_kontrol: "2026-11-26", kf_bawa: "Insulin, alat cek gula, daftar obat pulang",
+      kf_b1: "Sesak, demam lebih dari 38 °C, batuk setelah makan atau minum", kf_b2: "Lemas, berkeringat dingin, atau gula darah di bawah 70",
+      kf_telp: "0812-xxxx-xxxx", kf_prw: "Ns. C", kf_prwTelp: "Ruang Melati, ext. 213",
+    };
+  }
+  KKLP.docTool({ key: "konferensi-kasus", defaults, sample, render });
+})();
+</script>
+</body>
+</html>

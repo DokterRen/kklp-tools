@@ -106,6 +106,7 @@ input.over, textarea.over { border-color: #D4882B; background: var(--warn-bg); }
 
 /* ---------- printed sheets (shared by the A4 documents) ---------- */
 .sheet { width: 794px; height: 1123px; background: #FFFFFF; color: #16302E; font-family: 'Source Sans 3', 'Segoe UI', sans-serif; position: relative; }
+.sheet.land { width: 1123px; height: 794px; }
 .sheet .v { color: #16302E; font-weight: 600; }
 .sheet .cb { position: relative; }
 .sheet .cb.on::after { content: ""; position: absolute; left: 3px; top: -1px; width: 4px; height: 8px; border: solid #16302E; border-width: 0 2.2px 2.2px 0; transform: rotate(45deg); }
@@ -120,6 +121,7 @@ input.over, textarea.over { border-color: #D4882B; background: var(--warn-bg); }
   .pages { display: block !important; max-height: none !important; overflow: visible !important; padding: 0 !important; }
   .pagebox { width: 210mm !important; height: 297mm !important; box-shadow: none !important; overflow: hidden !important; break-after: page; page-break-after: always; }
   .pagebox:last-child { break-after: auto; page-break-after: auto; }
+  body.landscape .pagebox { width: 297mm !important; height: 210mm !important; }
   .pagebox > .sheet { transform: none !important; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

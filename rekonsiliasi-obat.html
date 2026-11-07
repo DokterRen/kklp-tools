@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rekonsiliasi Obat</title>
+<meta name="description" content="Rekonsiliasi obat pasien rawat inap: sebelum masuk, saat masuk, selama rawat inap, dan saat pulang, dengan telaah polifarmasi. Siap cetak A4 lanskap.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/instrumen.css">
+<style>
+@media print { @page { size: A4 landscape; margin: 0; } }
+.opts.three .opt span, .opts.two .opt span { min-height: 34px; }
+.opts.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+select { padding: 6px 4px; }
+.med { display: flex; flex-direction: column; gap: 5px; padding: 8px 0; border-top: 1px dashed var(--line); }
+.med:first-of-type { border-top: 0; padding-top: 2px; }
+.med[hidden] { display: none; }
+.med .mh { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--deep); }
+.med .mh .n { display: inline-flex; width: 22px; height: 22px; border-radius: 11px; background: var(--surface-2); color: var(--deep); align-items: center; justify-content: center; font-size: 12px; }
+.mg { display: grid; gap: 6px; }
+.mg.a { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 58px; }
+.mg.b { grid-template-columns: 86px minmax(0, 1fr); }
+.mg.c { grid-template-columns: 86px minmax(0, 1fr); }
+.mlbl { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: -3px; }
+.stage-l { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; color: var(--teal); margin: 2px 0 -2px; }
+.parafg { display: grid; grid-template-columns: 70px repeat(3, minmax(0, 1fr)); gap: 6px; align-items: center; }
+.parafg b { font-size: 12.5px; color: var(--muted); }
+
+/* ---- printed sheet (A4 landscape) ---- */
+.sheet .pg { width: 1123px; height: 794px; box-sizing: border-box; padding: 28px 34px 24px; display: flex; flex-direction: column; gap: 8px; font-family: 'Source Sans 3', 'Segoe UI', sans-serif; color: #16302E; }
+.sheet .lbl { font-size: 12px; font-weight: 700; color: #013A40; }
+.sheet .cb { display: inline-block; width: 12px; height: 12px; border: 1.5px solid #16302E; border-radius: 3px; box-sizing: border-box; flex-shrink: 0; }
+.sheet .cb.on::after { left: 2.5px; top: -1.5px; }
+.sheet .op { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.sheet .ops { display: flex; flex-wrap: wrap; gap: 3px 12px; font-size: 12px; align-items: center; }
+.sheet .box { border: 1.5px solid #9FC9C4; border-radius: 8px; padding: 5px 10px 7px; display: flex; flex-direction: column; gap: 4px; }
+.sheet .frow { display: flex; align-items: flex-end; gap: 6px; font-size: 12px; min-width: 0; }
+.sheet .frow > b { font-weight: 700; color: #013A40; flex-shrink: 0; padding-bottom: 2px; }
+.sheet .fv { flex-grow: 1; min-width: 0; height: 17px; border-bottom: 1.2px solid #B9CFCC; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; display: flex; align-items: flex-end; padding: 0 2px 1px; box-sizing: border-box; }
+.sheet .idv { height: 18px; border-bottom: 1.2px solid #8FB3AF; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; display: flex; align-items: flex-end; padding: 0 1px 1px; box-sizing: border-box; }
+.sheet .tb { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+.sheet .tb th { color: #FFFFFF; padding: 3px 6px; border: 1px solid #FFFFFF; font-weight: 700; text-align: left; line-height: 1.15; }
+.sheet .tb th.g { text-align: center; font-size: 11px; letter-spacing: .08em; padding: 3px 4px; }
+.sheet .tb td { border: 1px solid #B9CFCC; height: 24px; padding: 0 6px; }
+.sheet .tb td.n { text-align: center; color: #4A6563; font-weight: 700; }
+.sheet .tb td.c { padding: 0; text-align: center; }
+.sheet .tb td.sh { background: #F4FAF9; }
+.sheet .cell { height: 23px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; font-size: 12px; font-weight: 600; }
+.sheet .codes { display: inline-flex; gap: 3px; justify-content: center; align-items: center; height: 23px; }
+.sheet .codes span { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #4A6563; border-radius: 8px; box-sizing: border-box; }
+.sheet .codes span.sel { border: 1.6px solid #013A40; color: #013A40; }
+.sheet .codes.has span:not(.sel) { opacity: .3; }
+.sheet .k { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 3px; background: #E3EFED; color: #013A40; font-weight: 700; font-size: 11px; margin-right: 3px; }
+.sheet .ck { display: flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; }
+.sheet .mini { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11.5px; }
+.sheet .mini th { font-weight: 700; color: #4A6563; text-align: left; padding: 1px 4px; border-bottom: 1.2px solid #8FB3AF; }
+.sheet .mini td { height: 24px; border-bottom: 1px solid #B9CFCC; padding: 0 4px; color: #013A40; font-weight: 700; }
+.sheet .mini td .cell { height: 23px; font-size: 11.5px; color: #16302E; }
+.sheet .cnt { display: inline-block; min-width: 26px; text-align: center; }
+</style>
+</head>
+<body class="landscape">
+<header class="top">
+  <div class="brand">
+    <a class="home" href="./" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+    <div><h1>Rekonsiliasi Obat</h1><p>Sebelum masuk · saat masuk · rawat inap · saat pulang · A4 lanskap</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btn-new" type="button">Formulir baru</button>
+    <button class="btn" id="btn-sample" type="button">Contoh</button>
+    <button class="btn primary" id="btn-archive" type="button">Simpan ke daftar pasien</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="viewtoggle seg" role="group" aria-label="Tampilan">
+    <button type="button" data-view="form">Isi data</button><button type="button" data-view="preview">Pratinjau &amp; cetak</button>
+  </div>
+  <form class="form-col" id="form" autocomplete="off" onsubmit="return false">
+    <div class="idhint" id="idhint" hidden></div>
+    <details class="card"><summary>Daftar pasien tersimpan <span class="count" id="arsip-count">0</span></summary><div class="card-body">
+      <input type="search" id="arsip-cari" placeholder="Cari nama atau No. RM" aria-label="Cari pasien">
+      <div class="archive" id="archive"></div>
+      <div class="checks"><button class="btn sm" type="button" id="btn-json">Simpan file data (.json)</button><button class="btn sm" type="button" id="btn-open">Buka file data</button></div>
+      <p class="note">Daftar ini hanya tersimpan di browser perangkat ini.</p>
+    </div></details>
+    <div id="sections"></div>
+    <input type="file" id="file-in" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+  </form>
+
+  <section class="preview-col" aria-label="Pratinjau A4 lanskap">
+    <div class="ptools">
+      <button class="btn primary" id="btn-print" type="button">Cetak / Simpan PDF</button>
+      <button class="btn" id="btn-pdf" type="button">Unduh PDF</button>
+      <span class="sp"></span>
+      <span class="note">Cetak dengan orientasi lanskap. Kolom kosong tercetak untuk ditulis tangan.</span>
+    </div>
+    <div class="pages" id="pages"><div class="pagebox"><div class="sheet land" id="sheet1"></div></div></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { $, $$, esc, fmtDate, today } = KKLP;
+  const N = 16;
+  const R = (n) => Array.from({ length: n }, (_, i) => i + 1);
+  const SRC = [["P", "Pasien"], ["K", "Keluarga"], ["O", "Obat dibawa"], ["R", "Resep / rujukan"], ["M", "Rekam medis"], ["A", "Apotek"]];
+  const TELAAH = ["Duplikasi terapi", "Interaksi bermakna", "Dosis ginjal / hati", "Indikasi tiap obat", "STOPP / Beers", "START", "Jadwal lebih sederhana", "Tersedia di FKTP"];
+  const MASUK = [["L", "L · lanjut"], ["U", "U · ubah"], ["S", "S · stop"], ["T", "T · tunda"]];
+  const PULANG = [["L", "L · lanjut"], ["U", "U · ubah"], ["S", "S · stop"], ["B", "B · baru"]];
+
+  /* ---------- form ---------- */
+  const txt = (k, label, ph) => `<input type="text" data-k="${k}" aria-label="${esc(label)}"${ph ? ` placeholder="${esc(ph)}"` : ""}>`;
+  const fld = (k, label, ph, type) => `<div class="field"><label for="f-${k}">${label}</label><input type="${type || "text"}" id="f-${k}" data-k="${k}"${ph ? ` placeholder="${esc(ph)}"` : ""}></div>`;
+  const radios = (k, opts, cls) => `<div class="opts ${cls || ""}" role="radiogroup">${opts.map(([v, t]) => `<label class="opt"><input type="radio" name="${k}" data-k="${k}" value="${v}"><span>${t}</span></label>`).join("")}</div>`;
+  const checks = (items) => `<div class="checks">${items.map(([k, t]) => `<label><input type="checkbox" data-k="${k}"> ${t}</label>`).join("")}</div>`;
+  const sel = (k, label, opts) => `<select data-k="${k}" aria-label="${esc(label)}"><option value="">–</option>${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select>`;
+  const card = (id, no, title, inner, open) => `<details class="card" id="sec-${id}"${open ? " open" : ""}><summary>${no ? `<span class="secno">${no}</span> ` : ""}${title}</summary><div class="card-body">${inner}</div></details>`;
+  const medRow = (i) => `<div class="med rowin"><div class="mh"><span class="n">${i}</span>Obat ${i}</div>
+    <div class="stage-l">SEBELUM MASUK</div>
+    <div class="mg a">${txt("a" + i, "Obat " + i + " sebelum masuk: nama dan kekuatan", "nama obat, kekuatan")}${txt("b" + i, "Obat " + i + ": dosis, rute, frekuensi", "dosis · rute · frek.")}${txt("c" + i, "Obat " + i + ": kode sumber", "sumber")}</div>
+    <div class="stage-l">MASUK · RAWAT INAP</div>
+    <div class="mg b">${sel("d" + i, "Obat " + i + ": keputusan saat masuk", MASUK)}${txt("e" + i, "Obat " + i + ": obat, dosis, rute selama rawat inap", "obat, dosis, rute selama rawat")}</div>
+    <div class="stage-l">PULANG</div>
+    <div class="mg c">${sel("f" + i, "Obat " + i + ": keputusan saat pulang", PULANG)}${txt("g" + i, "Obat " + i + ": dosis saat pulang", "dosis saat pulang")}</div>
+    ${txt("h" + i, "Obat " + i + ": alasan perubahan / keterangan", "alasan perubahan / keterangan")}</div>`;
+
+  $("#sections").innerHTML =
+    card("id", "", "Identitas", `
+      <div class="field"><label for="f-nama">Nama pasien</label><input type="text" id="f-nama" data-k="nama" data-id="1"></div>
+      <div class="grid2"><div class="field"><label for="f-rm">No. RM</label><input type="text" id="f-rm" data-k="rm" data-id="1"></div>
+      ${fld("tglLahir", "Tanggal lahir", "", "date")}</div>
+      <div class="grid3">${fld("ruang", "Ruang")}${fld("tglMasuk", "Tgl masuk", "", "date")}${fld("tglPulang", "Tgl pulang", "", "date")}</div>`, true) +
+    card("al", "", "Alergi, sumber informasi, data klinis", `
+      <div class="field"><span class="lbl-ui">Alergi / reaksi obat</span>${radios("alergi", [["tidak", "Tidak ada"], ["tt", "Tidak diketahui"], ["ada", "Ada"]], "three")}</div>
+      <div class="grid2">${fld("alObat", "Obat penyebab")}${fld("alReaksi", "Reaksi")}</div>
+      <div class="field"><span class="lbl-ui">Sumber informasi (kodenya dipakai di kolom Sumber)</span>${checks(SRC.map(([k, t]) => ["s_" + k, k + " · " + t]))}</div>
+      <div class="grid3">${fld("bb", "BB (kg)", "", "text")}${fld("kreat", "Kreatinin")}${fld("egfr", "eGFR / CrCl")}</div>
+      <div class="field"><span class="lbl-ui">Fungsi hati</span>${radios("hati", [["normal", "Normal"], ["terganggu", "Terganggu"]], "two")}</div>
+      ${checks([["hamil", "Hamil"], ["menyusui", "Menyusui"]])}`, true) +
+    card("ob", "", "Daftar obat", `
+      <p class="note">Tanyakan juga obat bebas, jamu / herbal, suplemen, insulin / suntikan, inhaler, tetes mata, dan obat yang baru dihentikan. Obat yang dimulai saat rawat inap: kosongkan bagian Sebelum masuk.</p>
+      <p class="note">Keputusan: <b>L</b> lanjut · <b>U</b> ubah dosis / frekuensi / rute · <b>S</b> stop · <b>T</b> tunda sementara · <b>B</b> baru.</p>
+      <div class="rows" data-rows data-min="3">${R(N).map(medRow).join("")}</div>`, true) +
+    card("tl", "", "Telaah obat dan paraf", `
+      <div class="field"><span class="lbl-ui">Telaah yang sudah dilakukan</span>${checks(TELAAH.map((t, i) => ["r" + (i + 1), t]))}</div>
+      <p class="note">Jumlah obat (sebelum masuk, saat pulang, stop, baru, ubah) dihitung otomatis dari daftar.</p>
+      <div class="parafg"><span></span><b>Dokter</b><b>Apoteker</b><b>Perawat</b>
+        <b>Masuk</b>${txt("pDM", "Paraf dokter saat masuk")}${txt("pAM", "Paraf apoteker saat masuk")}${txt("pNM", "Paraf perawat saat masuk")}
+        <b>Pulang</b>${txt("pDP", "Paraf dokter saat pulang")}${txt("pAP", "Paraf apoteker saat pulang")}${txt("pNP", "Paraf perawat saat pulang")}</div>
+      <p class="note">Tulis nama / inisial dan tanggal; paraf dibubuhkan di lembar cetak.</p>`);
+
+  /* ---------- sheet ---------- */
+  const V = (k, cls) => `<span class="${cls} v" data-v="${k}" data-src="${k}" data-fit="8"></span>`;
+  const cell = (k) => `<div class="cell v" data-v="${k}" data-src="${k}" data-fit="8"></div>`;
+  const cb = (on, t) => `<span class="op"><span class="cb${on ? " on" : ""}"></span>${t}</span>`;
+  const codes = (letters, v) => `<span class="codes${v ? " has" : ""}">${letters.split("").map((c) => `<span class="${v === c ? "sel" : ""}">${c}</span>`).join("")}</span>`;
+  function counts(st) {
+    const rows = R(N);
+    const before = rows.filter((i) => (st["a" + i] || "").trim()).length;
+    const anyF = rows.some((i) => st["f" + i]);
+    const c = { before: before || "", after: "", stop: "", baru: "", ubah: "" };
+    if (anyF) {
+      c.after = rows.filter((i) => ["L", "U", "B"].includes(st["f" + i])).length;
+      c.stop = rows.filter((i) => st["f" + i] === "S" || (!st["f" + i] && st["d" + i] === "S" && (st["a" + i] || "").trim())).length;
+      c.baru = rows.filter((i) => st["f" + i] === "B").length;
+      c.ubah = rows.filter((i) => st["f" + i] === "U").length;
+    }
+    return c;
+  }
+  function render(st) {
+    const c = counts(st);
+    const cnt = (v) => `<span class="fv cnt">${v === "" ? "" : esc(v)}</span>`;
+    const rows = R(N).map((i) => `<tr><td class="n">${i}</td><td>${cell("a" + i)}</td><td>${cell("b" + i)}</td><td>${cell("c" + i)}</td><td class="c">${codes("LUST", st["d" + i])}</td><td class="sh">${cell("e" + i)}</td><td class="c">${codes("LUSB", st["f" + i])}</td><td>${cell("g" + i)}</td><td>${cell("h" + i)}</td></tr>`).join("");
+    const lbl = (t) => `<span style="color:#4A6563;font-weight:600">${t}</span>`;
+    $("#sheet1").innerHTML = `<div class="pg">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;border-bottom:3px solid #013A40;padding-bottom:7px">
+        <div style="display:flex;flex-direction:column;gap:1px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;color:#028090">KEDOKTERAN KELUARGA LAYANAN PRIMER</div>
+          <div style="font-family:'Source Serif 4',Georgia,serif;font-size:27px;font-weight:700;line-height:1.05;color:#013A40">Rekonsiliasi Obat</div>
+          <div style="font-size:12.5px;color:#4A6563">Sebelum masuk · saat masuk · selama rawat inap · saat pulang</div>
+        </div>
+        <div style="display:grid;grid-template-columns:52px 150px 96px 110px 66px 105px;gap:3px 8px;font-size:12px;align-items:end;flex-shrink:0">
+          ${lbl("Nama")}${V("nama", "idv")}
+          ${lbl("Tgl lahir / usia")}<span class="idv">${esc(ageText(st.tglLahir))}</span>
+          ${lbl("Tgl masuk")}<span class="idv">${esc(fmtDate(st.tglMasuk, "num"))}</span>
+          ${lbl("No. RM")}${V("rm", "idv")}
+          ${lbl("Ruang")}${V("ruang", "idv")}
+          ${lbl("Tgl pulang")}<span class="idv">${esc(fmtDate(st.tglPulang, "num"))}</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.1fr) minmax(0,1.15fr);gap:10px">
+        <div class="box" style="border-color:#C0272D;background:#FDF4F4">
+          <span class="lbl" style="color:#8E1C21">Alergi / reaksi obat</span>
+          <div class="ops">${cb(st.alergi === "tidak", "Tidak ada")}${cb(st.alergi === "tt", "Tidak diketahui")}${cb(st.alergi === "ada", "Ada:")}</div>
+          <div class="frow"><b>Obat</b>${V("alObat", "fv")}<b>Reaksi</b>${V("alReaksi", "fv")}</div>
+        </div>
+        <div class="box">
+          <span class="lbl">Sumber informasi (kode dipakai di kolom Sumber)</span>
+          <div class="ops" style="gap:4px 12px">${SRC.map(([k, t]) => `<span class="op"><span class="cb${st["s_" + k] ? " on" : ""}"></span><span class="k">${k}</span>${t}</span>`).join("")}</div>
+        </div>
+        <div class="box">
+          <span class="lbl">Data klinis untuk penyesuaian dosis</span>
+          <div class="frow"><b>BB</b>${V("bb", "fv")}<b>kg · Kreatinin</b>${V("kreat", "fv")}<b>eGFR / CrCl</b>${V("egfr", "fv")}</div>
+          <div class="ops" style="gap:3px 10px"><span class="lbl">Hati</span>${cb(st.hati === "normal", "Normal")}${cb(st.hati === "terganggu", "Terganggu")}<span style="width:0"></span>${cb(st.hamil, "Hamil")}${cb(st.menyusui, "Menyusui")}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <span style="font-family:'Source Serif 4',Georgia,serif;font-size:16px;font-weight:700;color:#013A40">Daftar obat</span>
+        <span style="font-size:12px;color:#4A6563">Tanyakan juga obat bebas, jamu / herbal, suplemen, insulin / suntikan, inhaler, tetes mata, dan obat yang baru dihentikan.</span>
+      </div>
+      <table class="tb">
+        <colgroup><col style="width:26px"><col style="width:172px"><col style="width:128px"><col style="width:58px"><col style="width:86px"><col style="width:180px"><col style="width:86px"><col style="width:122px"><col></colgroup>
+        <thead>
+          <tr>
+            <th rowspan="2" style="background:#013A40;text-align:center;padding:3px 0">No</th>
+            <th colspan="3" class="g" style="background:#013A40">SEBELUM MASUK RS</th>
+            <th class="g" style="background:#028090">MASUK</th>
+            <th class="g" style="background:#4A6563">RAWAT INAP</th>
+            <th colspan="2" class="g" style="background:#00648A">PULANG</th>
+            <th rowspan="2" style="background:#013A40">Alasan perubahan / keterangan</th>
+          </tr>
+          <tr>
+            <th style="background:#1C5A60">Nama obat, kekuatan</th>
+            <th style="background:#1C5A60">Dosis · rute · frek.</th>
+            <th style="background:#1C5A60;text-align:center">Sumber</th>
+            <th style="background:#2A9AA8;text-align:center">Keputusan</th>
+            <th style="background:#6A8583">Obat, dosis, rute</th>
+            <th style="background:#2A82A3;text-align:center">Keputusan</th>
+            <th style="background:#2A82A3">Dosis saat pulang</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="font-size:11.5px;color:#4A6563;margin-top:-3px">Lingkari: <b>L</b> lanjut · <b>U</b> ubah dosis / frekuensi / rute · <b>S</b> stop · <b>T</b> tunda sementara · <b>B</b> baru. Obat yang dimulai saat rawat inap: isi kolom Rawat inap saja, kolom Sebelum masuk dikosongkan.</div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,.9fr) minmax(0,.95fr);gap:10px;margin-top:auto">
+        <div class="box">
+          <span class="lbl">Telaah obat <span style="font-weight:400;color:#4A6563">centang bila sudah dinilai, temuan ditulis di kolom keterangan</span></span>
+          <div style="display:flex;flex-wrap:wrap;gap:5px 16px">${TELAAH.map((t, i) => `<span class="ck"><span class="cb${st["r" + (i + 1)] ? " on" : ""}"></span>${t}</span>`).join("")}</div>
+        </div>
+        <div class="box">
+          <span class="lbl">Ringkasan perubahan</span>
+          <div class="frow"><b>Jumlah obat: sebelum</b>${cnt(c.before)}<b>pulang</b>${cnt(c.after)}</div>
+          <div class="frow"><b>Stop</b>${cnt(c.stop)}<b>Baru</b>${cnt(c.baru)}<b>Ubah</b>${cnt(c.ubah)}</div>
+        </div>
+        <div class="box" style="gap:2px">
+          <table class="mini">
+            <colgroup><col style="width:58px"><col><col><col></colgroup>
+            <thead><tr><th>Paraf</th><th>Dokter</th><th>Apoteker</th><th>Perawat</th></tr></thead>
+            <tbody>
+              <tr><td>Masuk</td><td>${cell("pDM")}</td><td>${cell("pAM")}</td><td>${cell("pNM")}</td></tr>
+              <tr><td>Pulang</td><td>${cell("pDP")}</td><td>${cell("pAP")}</td><td>${cell("pNP")}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+    $$("#sheet1 [data-v]").forEach((el) => { el.textContent = st[el.dataset.v] || ""; });
+  }
+  function ageText(iso) {
+    if (!iso) return "";
+    const b = new Date(iso + "T00:00:00"), n = new Date();
+    if (isNaN(b)) return "";
+    let y = n.getFullYear() - b.getFullYear();
+    if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) y--;
+    return fmtDate(iso, "num") + (y >= 0 && y < 130 ? " · " + y + " th" : "");
+  }
+  function defaults() { return { tglMasuk: today() }; }
+  function sample() {
+    const m = [
+      ["Metformin 500 mg", "2 × 1 tab, oral", "O", "T", "Ditunda (infeksi akut)", "L", "2 × 500 mg", "Dilanjutkan; eGFR 55"],
+      ["Glibenklamid 5 mg", "1 × 1 tab pagi", "O", "S", "", "S", "", "Risiko hipoglikemia pada lansia (Beers)"],
+      ["Amlodipin 10 mg", "1 × 1 tab", "O", "L", "Amlodipin 10 mg 1×1", "U", "1 × 5 mg", "TD 100/60 saat duduk"],
+      ["Kandesartan 16 mg", "1 × 1 tab", "O", "T", "Ditunda (risiko AKI)", "L", "1 × 16 mg", "Kreatinin stabil"],
+      ["Atorvastatin 20 mg", "1 × 1 tab malam", "O", "L", "Atorvastatin 20 mg malam", "L", "1 × 20 mg malam", ""],
+      ["Klopidogrel 75 mg", "1 × 1 tab", "O", "L", "Klopidogrel 75 mg 1×1", "L", "1 × 75 mg", "Pencegahan stroke sekunder"],
+      ["Ranitidin 150 mg", "2 × 1 tab", "K", "S", "", "S", "", "Tanpa indikasi jelas"],
+      ["Vitamin B kompleks", "1 × 1 tab", "K", "S", "", "S", "", "Tanpa indikasi jelas; mengurangi jumlah tablet"],
+      ["Alprazolam 0,5 mg", "1 × 1 malam", "P", "U", "Alprazolam 0,25 mg malam", "S", "", "Diturunkan bertahap; risiko jatuh (STOPP)"],
+      ["Jamu temulawak", "1 × 1 gelas", "K", "S", "", "S", "", "Interaksi tidak jelas dengan klopidogrel"],
+      ["Parasetamol 500 mg", "bila nyeri, maks 3 × 1", "P", "L", "Parasetamol 500 mg bila perlu", "L", "bila perlu", ""],
+      ["", "", "", "", "Seftriakson 2 g IV 1×1 (hari 1–5)", "", "", "Pneumonia; selesai di RS"],
+      ["", "", "", "", "Insulin glargin 10 unit SK malam", "B", "10 unit malam", "Gula darah tidak terkendali; edukasi pena insulin"],
+    ];
+    const s = { nama: "Ibu Sumiati (contoh)", rm: "12-34-56", tglLahir: "1954-03-12", ruang: "Melati 3 / 2", tglMasuk: "2026-11-02", tglPulang: "2026-11-12",
+      alergi: "ada", alObat: "Kotrimoksazol", alReaksi: "Ruam kulit", s_P: true, s_K: true, s_O: true, s_M: true,
+      bb: "52", kreat: "1,0", egfr: "55", hati: "normal", r1: true, r2: true, r3: true, r4: true, r5: true, r6: true, r7: true,
+      pDM: "dr. A · 2/11", pAM: "apt. D · 3/11", pNM: "Ns. C · 2/11" };
+    m.forEach((r, i) => { "abcdefgh".split("").forEach((k, j) => { if (r[j]) s[k + (i + 1)] = r[j]; }); });
+    return s;
+  }
+  KKLP.docTool({ key: "rekonsiliasi-obat", defaults, sample, render });
+})();
+</script>
+</body>
+</html>
