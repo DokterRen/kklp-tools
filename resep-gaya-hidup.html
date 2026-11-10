@@ -113,11 +113,11 @@
   const DOKTER = "dr. Caren Andika Surbakti, Sp.KKLP";
   /* [key, letter, title, subtitle, border, dark, tint, example] — colours match the LMWPHI chart and the 6 Pilar leaflet */
   const P = [
-    ["m", "M", "Makan sehat", "nutrisi", "#6FA32E", "#3F6B14", "#F7FBF2", "mis. sayur di setiap makan, ganti teh manis dengan teh tawar"],
-    ["g", "G", "Aktif bergerak", "aktivitas fisik", "#0090C4", "#00648A", "#F2FAFD", "mis. jalan cepat 20 menit setiap pagi"],
-    ["t", "T", "Tidur cukup", "tidur yang memulihkan", "#B39600", "#7A6600", "#FDFBEF", "mis. tidur paling lambat pukul 22.00"],
-    ["s", "S", "Kelola stres", "manajemen stres", "#D98E00", "#8F5D00", "#FEF9F0", "mis. napas dalam 5 menit sebelum tidur"],
-    ["h", "H", "Jalin hubungan", "hubungan sosial", "#C0272D", "#8E1C21", "#FDF4F4", "mis. menelepon satu kerabat setiap hari"],
+    ["m", "M", "Pola makan sehat", "nutrisi", "#6FA32E", "#3F6B14", "#F7FBF2", "mis. sayur di setiap makan, ganti teh manis dengan teh tawar"],
+    ["g", "O", "Olahraga rutin", "aktivitas fisik", "#0090C4", "#00648A", "#F2FAFD", "mis. jalan cepat 20 menit setiap pagi"],
+    ["t", "T", "Tidur berkualitas", "tidur yang memulihkan", "#B39600", "#7A6600", "#FDFBEF", "mis. tidur paling lambat pukul 22.00"],
+    ["s", "S", "Pengelolaan stres", "manajemen stres", "#D98E00", "#8F5D00", "#FEF9F0", "mis. napas dalam 5 menit sebelum tidur"],
+    ["h", "K", "Koneksi sosial", "hubungan sosial", "#C0272D", "#8E1C21", "#FDF4F4", "mis. menelepon satu kerabat setiap hari"],
     ["z", "Z", "Hindari zat berisiko", "rokok, alkohol, NAPZA", "#7030A0", "#4F1F72", "#F8F3FB", "mis. tidak merokok di dalam rumah"],
   ];
   $("#pillar-inputs").innerHTML = P.map(([k, L, t, sub, b, d, tint, ex]) => `<div class="pill-in"><span class="bd" style="background:${d}">${L}</span><div class="rows">
